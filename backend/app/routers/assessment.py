@@ -1,8 +1,8 @@
 import os
 import re
-import difflib
 from datetime import datetime
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
+import uuid
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..models import User, AssessmentItem, AssessmentSession, AssessmentResponse
 from ..schemas import (
+    AssessmentStartRequest,
     AssessmentStartResponse,
     AssessmentItemOut,
     AssessmentResponseCreate,
@@ -22,33 +23,40 @@ from ..schemas import (
 from ..auth import get_current_user
 from ..seed_full_assessment import seed_full_assessment
 from ..services.ai_service import ai_service
+from ..config import settings
 
 router = APIRouter(prefix="/api/assessment", tags=["assessment"])
 
-# Local / Supabase audio storage directory
+# Audio storage directory for local fallback
 AUDIO_UPLOAD_DIR = os.path.join(os.getcwd(), "backend", "uploads", "audio")
 os.makedirs(AUDIO_UPLOAD_DIR, exist_ok=True)
 
+
 def normalize_text(text: str) -> str:
-    """Normalizes punctuation and casing for fair evaluation."""
+    """Normalizes punctuation, whitespace, and casing for fair evaluation."""
     if not text:
         return ""
     text = text.lower().strip()
     text = re.sub(r'[^\w\s]', '', text)
     return re.sub(r'\s+', ' ', text)
 
+
 @router.post("/start", response_model=AssessmentStartResponse, status_code=status.HTTP_201_CREATED)
 def start_assessment(
+    req: Optional[AssessmentStartRequest] = None,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Initializes a new assessment session and returns Section A items."""
+    """Initializes a new assessment session with candidate name and returns Section A items."""
     # Ensure full item bank is seeded
     seed_full_assessment(db)
+
+    candidate_name = (req.candidate_name if req and req.candidate_name else current_user.full_name or "Candidate").strip()
 
     # Create new session
     session = AssessmentSession(
         user_id=current_user.id,
+        candidate_name=candidate_name,
         status="in_progress",
         current_section="A",
         started_at=datetime.utcnow(),
@@ -67,17 +75,19 @@ def start_assessment(
     return {
         "session_id": session.id,
         "current_section": "A",
+        "candidate_name": session.candidate_name,
         "items": items
     }
 
+
 @router.get("/{session_id}/section/{section}", response_model=List[AssessmentItemOut])
 def get_section_items(
-    session_id: str,
+    session_id: uuid.UUID,
     section: str,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Fetches items for a specific section (A, B, C, or D) in sequence order."""
+    """Fetches items for a specific section (A, B, C, or D) in sequence order without leaking answers."""
     section_upper = section.upper()
     if section_upper not in ["A", "B", "C", "D"]:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid section. Must be A, B, C, or D.")
@@ -99,14 +109,15 @@ def get_section_items(
 
     return items
 
+
 @router.post("/{session_id}/respond", response_model=AssessmentResponseOut)
 def record_response(
-    session_id: str,
+    session_id: uuid.UUID,
     resp_in: AssessmentResponseCreate,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Records an MCQ choice or response metadata."""
+    """Records an MCQ choice or response metadata with server-side grading."""
     session = db.query(AssessmentSession).filter(
         AssessmentSession.id == session_id,
         AssessmentSession.user_id == current_user.id
@@ -119,7 +130,7 @@ def record_response(
     if not item:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Assessment item not found")
 
-    # Evaluate correctness if item is auto-gradable MCQ
+    # Evaluate correctness server-side if item is an auto-gradable MCQ
     is_correct = None
     similarity = None
 
@@ -129,12 +140,6 @@ def record_response(
         if submitted and correct:
             is_correct = normalize_text(submitted) == normalize_text(correct)
             similarity = 1.0 if is_correct else 0.0
-    elif item.item_type in ["listen_repeat"]:
-        norm_user = normalize_text(resp_in.user_answer_text or "")
-        norm_correct = normalize_text(item.correct_answer or "")
-        if norm_user and norm_correct:
-            similarity = round(difflib.SequenceMatcher(None, norm_user, norm_correct).ratio(), 3)
-            is_correct = similarity >= 0.70
 
     # Upsert response for this item & session
     response = db.query(AssessmentResponse).filter(
@@ -155,11 +160,12 @@ def record_response(
         )
         db.add(response)
     else:
-        if resp_in.user_answer_text:
+        if resp_in.user_answer_text is not None:
             response.user_answer_text = resp_in.user_answer_text
-        if resp_in.mcq_choice:
+        if resp_in.mcq_choice is not None:
             response.mcq_choice = resp_in.mcq_choice
-        response.response_time_ms = resp_in.response_time_ms
+        if resp_in.response_time_ms is not None:
+            response.response_time_ms = resp_in.response_time_ms
         response.is_correct = is_correct
         response.similarity_score = similarity
 
@@ -168,15 +174,16 @@ def record_response(
 
     return response
 
+
 @router.post("/{session_id}/upload-audio", response_model=AudioUploadResponse)
 async def upload_audio_recording(
-    session_id: str,
+    session_id: uuid.UUID,
     item_id: str = Form(...),
     file: UploadFile = File(...),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Uploads recorded audio for Section A/B speaking tasks to storage."""
+    """Uploads recorded audio for Section A/B speaking tasks to Supabase Storage (with local fallback)."""
     session = db.query(AssessmentSession).filter(
         AssessmentSession.id == session_id,
         AssessmentSession.user_id == current_user.id
@@ -189,17 +196,34 @@ async def upload_audio_recording(
     if not item:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Assessment item not found")
 
-    # Generate storage file key: {user_id}/{session_id}/{item_id}.webm
-    user_session_dir = os.path.join(AUDIO_UPLOAD_DIR, current_user.id, session_id)
-    os.makedirs(user_session_dir, exist_ok=True)
+    # Generate storage key: {user_id}/{session_id}/{item_id}.webm
     filename = f"{item_id}.webm"
-    file_path = os.path.join(user_session_dir, filename)
+    storage_key = f"{str(current_user.id)}/{str(session_id)}/{filename}"
 
     content = await file.read()
+
+    # Attempt Supabase Storage upload if credentials are provided
+    uploaded_to_supabase = False
+    if settings.supabase_url and settings.supabase_key:
+        try:
+            from supabase import create_client
+            supabase_client = create_client(settings.supabase_url, settings.supabase_key)
+            # Ensure bucket exists or upload directly
+            res = supabase_client.storage.from_("assessment-audio").upload(
+                file=content,
+                path=storage_key,
+                file_options={"content-type": "audio/webm", "upsert": "true"}
+            )
+            uploaded_to_supabase = True
+        except Exception:
+            uploaded_to_supabase = False
+
+    # Always persist locally as well for seamless fallback & dev testing
+    user_session_dir = os.path.join(AUDIO_UPLOAD_DIR, str(current_user.id), str(session_id))
+    os.makedirs(user_session_dir, exist_ok=True)
+    file_path = os.path.join(user_session_dir, filename)
     with open(file_path, "wb") as f:
         f.write(content)
-
-    storage_key = f"{current_user.id}/{session_id}/{filename}"
 
     # Update or create AssessmentResponse with audio path
     response = db.query(AssessmentResponse).filter(
@@ -228,6 +252,7 @@ async def upload_audio_recording(
         "message": "Audio recording uploaded successfully"
     }
 
+
 @router.get("/audio/{user_id}/{session_id}/{filename}")
 def stream_audio_file(
     user_id: str,
@@ -236,9 +261,8 @@ def stream_audio_file(
     current_user: User = Depends(get_current_user)
 ):
     """Serves uploaded assessment audio for student review."""
-    # Ensure students can only review their own recordings
-    if current_user.id != user_id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    if str(current_user.id) != user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied to recording")
 
     file_path = os.path.join(AUDIO_UPLOAD_DIR, user_id, session_id, filename)
     if not os.path.exists(file_path):
@@ -246,14 +270,15 @@ def stream_audio_file(
 
     return FileResponse(file_path, media_type="audio/webm", filename=filename)
 
+
 @router.post("/{session_id}/tab-switch")
 def record_tab_switch(
-    session_id: str,
-    req: TabSwitchRequest,
+    session_id: uuid.UUID,
+    req: Optional[TabSwitchRequest] = None,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Increments tab switch count and logs proctoring warning timestamp."""
+    """Increments tab switch count and logs proctoring warning timestamp across all sections."""
     session = db.query(AssessmentSession).filter(
         AssessmentSession.id == session_id,
         AssessmentSession.user_id == current_user.id
@@ -264,23 +289,26 @@ def record_tab_switch(
 
     session.tab_switch_count += 1
     current_warnings = list(session.warnings or [])
-    current_warnings.append(f"Tab switch detected at {datetime.utcnow().isoformat()}")
+    timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+    current_warnings.append(f"Tab switch detected at {timestamp}")
     session.warnings = current_warnings
     db.commit()
 
     return {
         "session_id": session.id,
         "tab_switch_count": session.tab_switch_count,
+        "warnings": session.warnings,
         "status": "warning_logged"
     }
 
+
 @router.post("/{session_id}/complete", response_model=AssessmentResultsOut)
 def complete_assessment_session(
-    session_id: str,
+    session_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Concludes the 4-section assessment, auto-grades C & D, and calls AI for study pacing summary."""
+    """Concludes the 4-section assessment, auto-grades C & D, and calls AI for non-diagnostic summary."""
     session = db.query(AssessmentSession).filter(
         AssessmentSession.id == session_id,
         AssessmentSession.user_id == current_user.id
@@ -316,7 +344,8 @@ def complete_assessment_session(
         section_c_score=c_score,
         section_d_score=d_score,
         speaking_items_count=audio_recorded_count,
-        tab_switch_count=session.tab_switch_count
+        tab_switch_count=session.tab_switch_count,
+        candidate_name=session.candidate_name or current_user.full_name or "Candidate"
     )
 
     per_section = {
@@ -355,23 +384,30 @@ def complete_assessment_session(
     session.per_type_breakdown = per_section
     db.commit()
 
+    audio_urls = {
+        r.item_id: f"/api/assessment/audio/{str(current_user.id)}/{str(session.id)}/{r.item_id}.webm"
+        for r in responses if r.audio_storage_path
+    }
+
     return {
         "session_id": session.id,
+        "candidate_name": session.candidate_name,
         "status": session.status,
         "overall_score": session.overall_score,
         "auto_graded_score": ai_summary_data["auto_graded_score"],
         "tab_switch_count": session.tab_switch_count,
         "per_section_breakdown": per_section,
         "ai_summary": session.ai_summary,
-        "audio_review_urls": {r.item_id: r.audio_storage_path for r in responses if r.audio_storage_path},
+        "audio_review_urls": audio_urls,
         "recommended_focus_span_minutes": ai_summary_data["recommended_focus_span_minutes"],
         "recommended_content_style": ai_summary_data["recommended_content_style"],
         "recommended_difficulty_level": ai_summary_data["recommended_difficulty_level"]
     }
 
+
 @router.get("/{session_id}/results", response_model=AssessmentResultsOut)
 def get_assessment_results(
-    session_id: str,
+    session_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -385,10 +421,14 @@ def get_assessment_results(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Assessment session not found")
 
     responses = db.query(AssessmentResponse).filter(AssessmentResponse.session_id == session.id).all()
-    audio_urls = {r.item_id: r.audio_storage_path for r in responses if r.audio_storage_path}
+    audio_urls = {
+        r.item_id: f"/api/assessment/audio/{str(current_user.id)}/{str(session.id)}/{r.item_id}.webm"
+        for r in responses if r.audio_storage_path
+    }
 
     return {
         "session_id": session.id,
+        "candidate_name": session.candidate_name,
         "status": session.status,
         "overall_score": session.overall_score or 0.0,
         "auto_graded_score": session.overall_score or 0.0,
@@ -397,16 +437,17 @@ def get_assessment_results(
         "ai_summary": session.ai_summary or "Assessment completed.",
         "audio_review_urls": audio_urls,
         "recommended_focus_span_minutes": 25,
-        "recommended_content_style": "bullet_points",
+        "recommended_content_style": "visual",
         "recommended_difficulty_level": "adaptive"
     }
+
 
 @router.get("/history", response_model=List[AssessmentSessionOut])
 def get_assessment_history(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Returns past assessment sessions for the user."""
+    """Returns past assessment sessions for the current user."""
     return db.query(AssessmentSession).filter(
         AssessmentSession.user_id == current_user.id,
         AssessmentSession.status == "completed"

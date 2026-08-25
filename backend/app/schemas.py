@@ -89,3 +89,91 @@ class RecommendationOut(BaseModel):
     suggested_focus_minutes: int
     suggested_break_minutes: int
     motivational_note: str
+
+
+# ---------- Assessment ----------
+class AssessmentStartRequest(BaseModel):
+    candidate_name: Optional[str] = "Candidate"
+
+class AssessmentItemOut(BaseModel):
+    id: str
+    section: str
+    item_type: str
+    sequence_index: int
+    prompt_text: str
+    options: Optional[List[str]] = None
+    hints: Optional[List[str]] = None
+    time_limit_seconds: Optional[int] = None
+    passage_group_id: Optional[str] = None
+    difficulty: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+class AssessmentStartResponse(BaseModel):
+    session_id: uuid.UUID
+    current_section: str
+    candidate_name: Optional[str] = None
+    items: List[AssessmentItemOut]
+
+class AssessmentResponseCreate(BaseModel):
+    item_id: str
+    mcq_choice: Optional[str] = None
+    user_answer_text: Optional[str] = None
+    response_time_ms: Optional[int] = None
+
+class AssessmentResponseOut(BaseModel):
+    id: uuid.UUID
+    session_id: uuid.UUID
+    item_id: str
+    response_type: str
+    mcq_choice: Optional[str] = None
+    is_correct: Optional[bool] = None
+    similarity_score: Optional[float] = None
+    response_time_ms: Optional[int] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class TabSwitchRequest(BaseModel):
+    reason: Optional[str] = "Tab switched or window lost focus"
+
+class AudioUploadResponse(BaseModel):
+    session_id: uuid.UUID
+    item_id: str
+    audio_storage_path: str
+    message: str
+
+class AssessmentSessionOut(BaseModel):
+    id: uuid.UUID
+    candidate_name: Optional[str] = None
+    status: str
+    current_section: str
+    started_at: datetime
+    completed_at: Optional[datetime] = None
+    tab_switch_count: int
+    warnings: List[Any] = []
+    overall_score: Optional[float] = None
+    ai_summary: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+class AssessmentResultsOut(BaseModel):
+    session_id: uuid.UUID
+    candidate_name: Optional[str] = None
+    status: str
+    overall_score: Optional[float] = None
+    auto_graded_score: Optional[float] = None
+    tab_switch_count: int = 0
+    per_section_breakdown: dict = {}
+    ai_summary: Optional[str] = None
+    audio_review_urls: dict = {}
+    recommended_focus_span_minutes: Optional[int] = 25
+    recommended_content_style: Optional[str] = "visual"
+    recommended_difficulty_level: Optional[str] = "adaptive"
+
+    class Config:
+        from_attributes = True
+

@@ -3,13 +3,13 @@ from .models import AssessmentItem
 
 FULL_SEED_ITEMS = [
     # ==================== SECTION A: Reading & Listening ====================
-    # Read-Aloud Items (1-18)
+    # 18 Read-Aloud Questions
     {
         "id": "sec-a-ra-1",
         "section": "A",
         "item_type": "read_aloud",
         "sequence_index": 1,
-        "prompt_text": "The sun rises in the east and sets in the west every single day.",
+        "prompt_text": "The vibrant flowers bloomed in the garden.",
         "time_limit_seconds": 15,
         "difficulty": "easy"
     },
@@ -18,7 +18,7 @@ FULL_SEED_ITEMS = [
         "section": "A",
         "item_type": "read_aloud",
         "sequence_index": 2,
-        "prompt_text": "Regular physical exercise improves cardiovascular health and boosts mental energy.",
+        "prompt_text": "Technology has significantly changed how people communicate today.",
         "time_limit_seconds": 15,
         "difficulty": "easy"
     },
@@ -27,8 +27,8 @@ FULL_SEED_ITEMS = [
         "section": "A",
         "item_type": "read_aloud",
         "sequence_index": 3,
-        "prompt_text": "Technology has transformed the way people communicate across global distances.",
-        "time_limit_seconds": 15,
+        "prompt_text": "The conference will be held next month in the downtown convention center.",
+        "time_limit_seconds": 18,
         "difficulty": "easy"
     },
     {
@@ -36,8 +36,8 @@ FULL_SEED_ITEMS = [
         "section": "A",
         "item_type": "read_aloud",
         "sequence_index": 4,
-        "prompt_text": "Reading books expands vocabulary and develops critical thinking skills.",
-        "time_limit_seconds": 15,
+        "prompt_text": "Effective communication skills are essential for professional success in any field.",
+        "time_limit_seconds": 18,
         "difficulty": "easy"
     },
     {
@@ -45,8 +45,8 @@ FULL_SEED_ITEMS = [
         "section": "A",
         "item_type": "read_aloud",
         "sequence_index": 5,
-        "prompt_text": "Clean water and sanitation are fundamental requirements for human well-being.",
-        "time_limit_seconds": 15,
+        "prompt_text": "Global warming is becoming a serious concern for scientists and policymakers worldwide.",
+        "time_limit_seconds": 18,
         "difficulty": "easy"
     },
     {
@@ -54,7 +54,7 @@ FULL_SEED_ITEMS = [
         "section": "A",
         "item_type": "read_aloud",
         "sequence_index": 6,
-        "prompt_text": "Renewable energy sources like solar and wind power help reduce carbon emissions.",
+        "prompt_text": "The company announced a new initiative to promote sustainability and reduce carbon emissions.",
         "time_limit_seconds": 20,
         "difficulty": "medium"
     },
@@ -63,7 +63,7 @@ FULL_SEED_ITEMS = [
         "section": "A",
         "item_type": "read_aloud",
         "sequence_index": 7,
-        "prompt_text": "Effective teamwork requires clear communication, active listening, and mutual respect.",
+        "prompt_text": "Despite the heavy rain, the event continued as planned with enthusiastic participation from attendees.",
         "time_limit_seconds": 20,
         "difficulty": "medium"
     },
@@ -72,7 +72,7 @@ FULL_SEED_ITEMS = [
         "section": "A",
         "item_type": "read_aloud",
         "sequence_index": 8,
-        "prompt_text": "Scientific research provides evidence-based solutions to complex environmental challenges.",
+        "prompt_text": "Artificial intelligence is transforming industries by automating complex tasks and improving efficiency.",
         "time_limit_seconds": 20,
         "difficulty": "medium"
     },
@@ -81,7 +81,7 @@ FULL_SEED_ITEMS = [
         "section": "A",
         "item_type": "read_aloud",
         "sequence_index": 9,
-        "prompt_text": "Financial literacy enables individuals to make informed decisions about budgeting and saving.",
+        "prompt_text": "The research team discovered groundbreaking evidence that could revolutionize our understanding of climate patterns.",
         "time_limit_seconds": 20,
         "difficulty": "medium"
     },
@@ -90,7 +90,7 @@ FULL_SEED_ITEMS = [
         "section": "A",
         "item_type": "read_aloud",
         "sequence_index": 10,
-        "prompt_text": "Cultural diversity enriches society by introducing varied perspectives, traditions, and art forms.",
+        "prompt_text": "Customer satisfaction remains our top priority, and we continuously strive to exceed expectations through innovative solutions.",
         "time_limit_seconds": 20,
         "difficulty": "medium"
     },
@@ -99,8 +99,8 @@ FULL_SEED_ITEMS = [
         "section": "A",
         "item_type": "read_aloud",
         "sequence_index": 11,
-        "prompt_text": "Architectural innovations in urban planning emphasize sustainability, green spaces, and efficient transport.",
-        "time_limit_seconds": 25,
+        "prompt_text": "The digital transformation has enabled businesses to reach global markets, streamline operations, and enhance customer experiences through data-driven insights.",
+        "time_limit_seconds": 20,
         "difficulty": "medium"
     },
     {
@@ -108,8 +108,8 @@ FULL_SEED_ITEMS = [
         "section": "A",
         "item_type": "read_aloud",
         "sequence_index": 12,
-        "prompt_text": "Digital privacy regulations aim to protect consumer data against unauthorized commercial exploitation.",
-        "time_limit_seconds": 25,
+        "prompt_text": "Educational institutions are adopting new teaching methodologies that emphasize critical thinking, creativity, and collaborative problem-solving skills.",
+        "time_limit_seconds": 20,
         "difficulty": "medium"
     },
     {
@@ -117,8 +117,8 @@ FULL_SEED_ITEMS = [
         "section": "A",
         "item_type": "read_aloud",
         "sequence_index": 13,
-        "prompt_text": "Biodiversity conservation is essential to maintaining ecological balance and resilient ecosystems.",
-        "time_limit_seconds": 25,
+        "prompt_text": "The healthcare industry is experiencing rapid advancements in medical technology, enabling early disease detection and personalized treatment plans for patients.",
+        "time_limit_seconds": 20,
         "difficulty": "hard"
     },
     {
@@ -126,8 +126,8 @@ FULL_SEED_ITEMS = [
         "section": "A",
         "item_type": "read_aloud",
         "sequence_index": 14,
-        "prompt_text": "Artificial intelligence algorithms analyze vast datasets to identify subtle patterns and forecast economic trends.",
-        "time_limit_seconds": 25,
+        "prompt_text": "Sustainable development requires balancing economic growth with environmental protection, ensuring that future generations inherit a healthy planet with abundant natural resources.",
+        "time_limit_seconds": 20,
         "difficulty": "hard"
     },
     {
@@ -135,8 +135,8 @@ FULL_SEED_ITEMS = [
         "section": "A",
         "item_type": "read_aloud",
         "sequence_index": 15,
-        "prompt_text": "Philosophical inquiries into human consciousness explore the interplay between biological neural networks and subjective experience.",
-        "time_limit_seconds": 30,
+        "prompt_text": "Cross-cultural communication plays a vital role in international business, requiring professionals to understand diverse perspectives, customs, and communication styles to build successful partnerships.",
+        "time_limit_seconds": 20,
         "difficulty": "hard"
     },
     {
@@ -144,8 +144,8 @@ FULL_SEED_ITEMS = [
         "section": "A",
         "item_type": "read_aloud",
         "sequence_index": 16,
-        "prompt_text": "Space exploration missions provide valuable technological spinoffs that benefit terrestrial medicine and materials science.",
-        "time_limit_seconds": 30,
+        "prompt_text": "The rapid pace of technological innovation presents both opportunities and challenges for organizations, necessitating continuous learning and adaptation to remain competitive in the global marketplace.",
+        "time_limit_seconds": 20,
         "difficulty": "hard"
     },
     {
@@ -153,8 +153,8 @@ FULL_SEED_ITEMS = [
         "section": "A",
         "item_type": "read_aloud",
         "sequence_index": 17,
-        "prompt_text": "Macroeconomic stabilization policies attempt to balance inflation control with sustainable employment growth.",
-        "time_limit_seconds": 30,
+        "prompt_text": "Leadership development programs focus on cultivating essential skills such as strategic thinking, emotional intelligence, and effective decision-making, preparing individuals to navigate complex organizational challenges.",
+        "time_limit_seconds": 20,
         "difficulty": "hard"
     },
     {
@@ -162,19 +162,18 @@ FULL_SEED_ITEMS = [
         "section": "A",
         "item_type": "read_aloud",
         "sequence_index": 18,
-        "prompt_text": "Interdisciplinary collaboration accelerates discoveries by synthesizing methodologies from physics, biology, and computer engineering.",
-        "time_limit_seconds": 30,
+        "prompt_text": "The integration of renewable energy sources into existing power grids requires substantial infrastructure investments, policy reforms, and technological innovations to ensure reliable, sustainable electricity supply for growing populations.",
+        "time_limit_seconds": 20,
         "difficulty": "hard"
     },
-
-    # Listen-and-Repeat Items (19-23)
+    # 5 Listen and Repeat Questions
     {
         "id": "sec-a-lr-19",
         "section": "A",
         "item_type": "listen_repeat",
         "sequence_index": 19,
-        "prompt_text": "Please submit your assignment before midnight.",
-        "correct_answer": "Please submit your assignment before midnight",
+        "prompt_text": "The meeting has been rescheduled to Monday morning.",
+        "correct_answer": "The meeting has been rescheduled to Monday morning.",
         "time_limit_seconds": 15,
         "difficulty": "easy"
     },
@@ -183,56 +182,56 @@ FULL_SEED_ITEMS = [
         "section": "A",
         "item_type": "listen_repeat",
         "sequence_index": 20,
-        "prompt_text": "The library will be closed for holiday maintenance this weekend.",
-        "correct_answer": "The library will be closed for holiday maintenance this weekend",
+        "prompt_text": "Global warming is becoming a serious concern worldwide.",
+        "correct_answer": "Global warming is becoming a serious concern worldwide.",
         "time_limit_seconds": 15,
-        "difficulty": "medium"
+        "difficulty": "easy"
     },
     {
         "id": "sec-a-lr-21",
         "section": "A",
         "item_type": "listen_repeat",
         "sequence_index": 21,
-        "prompt_text": "Students are encouraged to participate in extracurricular academic workshops.",
-        "correct_answer": "Students are encouraged to participate in extracurricular academic workshops",
+        "prompt_text": "Please submit your reports by the end of this week.",
+        "correct_answer": "Please submit your reports by the end of this week.",
         "time_limit_seconds": 15,
-        "difficulty": "medium"
+        "difficulty": "easy"
     },
     {
         "id": "sec-a-lr-22",
         "section": "A",
         "item_type": "listen_repeat",
         "sequence_index": 22,
-        "prompt_text": "Innovative solutions require creative problem solving and analytical thinking.",
-        "correct_answer": "Innovative solutions require creative problem solving and analytical thinking",
-        "time_limit_seconds": 20,
-        "difficulty": "hard"
+        "prompt_text": "The project deadline has been extended by two weeks.",
+        "correct_answer": "The project deadline has been extended by two weeks.",
+        "time_limit_seconds": 15,
+        "difficulty": "easy"
     },
     {
         "id": "sec-a-lr-23",
         "section": "A",
         "item_type": "listen_repeat",
         "sequence_index": 23,
-        "prompt_text": "The conference keynote address focused on sustainable agricultural practices in developing nations.",
-        "correct_answer": "The conference keynote address focused on sustainable agricultural practices in developing nations",
-        "time_limit_seconds": 20,
-        "difficulty": "hard"
+        "prompt_text": "Customer feedback is essential for improving our services.",
+        "correct_answer": "Customer feedback is essential for improving our services.",
+        "time_limit_seconds": 15,
+        "difficulty": "easy"
     },
 
-    # ==================== SECTION B: Speaking Topics (4 Topics) ====================
+    # ==================== SECTION B: Speaking ====================
     {
         "id": "sec-b-topic-1",
         "section": "B",
         "item_type": "speaking_task",
         "sequence_index": 1,
-        "prompt_text": "Describe a memorable vacation or trip you took with family or friends.",
+        "prompt_text": "Importance of Healthy Eating",
         "hints": [
-            "Where did you go and who went with you?",
-            "What activities did you enjoy the most?",
-            "Why was this trip particularly special or memorable?"
+            "What does healthy eating mean to you?",
+            "How does diet affect physical and mental health?",
+            "What are some challenges in maintaining a healthy diet?",
+            "What advice would you give to someone starting a healthy eating journey?"
         ],
-        "display_seconds": 90, # 90s prep phase
-        "time_limit_seconds": 60, # 60s speaking recording phase
+        "time_limit_seconds": 60,
         "difficulty": "medium"
     },
     {
@@ -240,13 +239,13 @@ FULL_SEED_ITEMS = [
         "section": "B",
         "item_type": "speaking_task",
         "sequence_index": 2,
-        "prompt_text": "Discuss an important goal you set for yourself and how you achieved it.",
+        "prompt_text": "Impact of Technology on Communication",
         "hints": [
-            "What was the specific goal you wanted to accomplish?",
-            "What obstacles or challenges did you encounter?",
-            "How did achieving this goal impact your personal growth?"
+            "How has technology changed the way we communicate?",
+            "What are the advantages of digital communication?",
+            "What are the disadvantages or challenges?",
+            "Do you think technology has improved or harmed personal relationships?"
         ],
-        "display_seconds": 90,
         "time_limit_seconds": 60,
         "difficulty": "medium"
     },
@@ -255,412 +254,661 @@ FULL_SEED_ITEMS = [
         "section": "B",
         "item_type": "speaking_task",
         "sequence_index": 3,
-        "prompt_text": "Should online learning replace traditional classroom education? Share your view.",
+        "prompt_text": "Advantages and Disadvantages of Social Media",
         "hints": [
-            "What are the major advantages of online education?",
-            "What unique benefits does in-person classroom learning offer?",
-            "What is your ultimate recommendation for future education?"
+            "What are the main benefits of social media?",
+            "What negative impacts have you observed?",
+            "How does social media affect young people?",
+            "Should there be more regulation of social media platforms?"
         ],
-        "display_seconds": 90,
         "time_limit_seconds": 60,
-        "difficulty": "hard"
+        "difficulty": "medium"
     },
     {
         "id": "sec-b-topic-4",
         "section": "B",
         "item_type": "speaking_task",
         "sequence_index": 4,
-        "prompt_text": "Describe a person who has strongly influenced your career or life choices.",
+        "prompt_text": "A Memorable Day in Your Life",
         "hints": [
-            "Who is this person and how do you know them?",
-            "What specific qualities or actions inspired you?",
-            "How have you applied their advice in your own life?"
+            "When and where did this memorable day occur?",
+            "What made this day special or unforgettable?",
+            "Who was with you and what did you do?",
+            "How did this experience impact you or change your perspective?"
         ],
-        "display_seconds": 90,
         "time_limit_seconds": 60,
         "difficulty": "medium"
     },
 
-    # ==================== SECTION C: Grammar MCQs (34 Questions) ====================
-    # Verb Forms (1-7)
+    # ==================== SECTION C: Grammar ====================
+    # 1. Verb Forms (8 questions)
     {
-        "id": "sec-c-g-1", "section": "C", "item_type": "grammar_mcq", "sequence_index": 1,
-        "prompt_text": "She _____ to the market yesterday morning.",
-        "options": ["go", "went", "gone", "going"], "correct_answer": "went", "difficulty": "easy"
+        "id": "sec-c-g-1",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 1,
+        "prompt_text": "She ___ to school every day.",
+        "options": ["go", "goes", "going", "gone"],
+        "correct_answer": "goes",
+        "difficulty": "easy"
     },
     {
-        "id": "sec-c-g-2", "section": "C", "item_type": "grammar_mcq", "sequence_index": 2,
-        "prompt_text": "They have _____ their homework already.",
-        "options": ["finish", "finishing", "finished", "finishes"], "correct_answer": "finished", "difficulty": "easy"
+        "id": "sec-c-g-2",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 2,
+        "prompt_text": "They ___ playing football now.",
+        "options": ["is", "are", "was", "were"],
+        "correct_answer": "are",
+        "difficulty": "easy"
     },
     {
-        "id": "sec-c-g-3", "section": "C", "item_type": "grammar_mcq", "sequence_index": 3,
-        "prompt_text": "If I _____ rich, I would travel around the world.",
-        "options": ["am", "was", "were", "been"], "correct_answer": "were", "difficulty": "medium"
+        "id": "sec-c-g-3",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 3,
+        "prompt_text": "He ___ his homework yesterday.",
+        "options": ["do", "does", "did", "done"],
+        "correct_answer": "did",
+        "difficulty": "easy"
     },
     {
-        "id": "sec-c-g-4", "section": "C", "item_type": "grammar_mcq", "sequence_index": 4,
-        "prompt_text": "The teacher made us _____ the essay twice.",
-        "options": ["rewrite", "to rewrite", "rewriting", "rewritten"], "correct_answer": "rewrite", "difficulty": "medium"
+        "id": "sec-c-g-4",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 4,
+        "prompt_text": "We ___ to the park tomorrow.",
+        "options": ["go", "goes", "will go", "went"],
+        "correct_answer": "will go",
+        "difficulty": "easy"
     },
     {
-        "id": "sec-c-g-5", "section": "C", "item_type": "grammar_mcq", "sequence_index": 5,
-        "prompt_text": "Would you mind _____ the window, please?",
-        "options": ["open", "to open", "opening", "opened"], "correct_answer": "opening", "difficulty": "medium"
+        "id": "sec-c-g-5",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 5,
+        "prompt_text": "She ___ a book when I called.",
+        "options": ["read", "reads", "was reading", "is reading"],
+        "correct_answer": "was reading",
+        "difficulty": "medium"
     },
     {
-        "id": "sec-c-g-6", "section": "C", "item_type": "grammar_mcq", "sequence_index": 6,
-        "prompt_text": "By the time we arrived, the movie had already _____.",
-        "options": ["began", "begin", "begun", "beginning"], "correct_answer": "begun", "difficulty": "medium"
+        "id": "sec-c-g-6",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 6,
+        "prompt_text": "They ___ in this city since 2010.",
+        "options": ["live", "lives", "have lived", "had lived"],
+        "correct_answer": "have lived",
+        "difficulty": "medium"
     },
     {
-        "id": "sec-c-g-7", "section": "C", "item_type": "grammar_mcq", "sequence_index": 7,
-        "prompt_text": "She is accustomed to _____ early in the morning.",
-        "options": ["wake up", "waking up", "woke up", "woken up"], "correct_answer": "waking up", "difficulty": "hard"
-    },
-
-    # Tenses (8-14)
-    {
-        "id": "sec-c-g-8", "section": "C", "item_type": "grammar_mcq", "sequence_index": 8,
-        "prompt_text": "Look! The children _____ in the garden.",
-        "options": ["play", "are playing", "played", "have played"], "correct_answer": "are playing", "difficulty": "easy"
+        "id": "sec-c-g-7",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 7,
+        "prompt_text": "The children ___ in the garden.",
+        "options": ["play", "plays", "playing", "are playing"],
+        "correct_answer": "are playing",
+        "difficulty": "easy"
     },
     {
-        "id": "sec-c-g-9", "section": "C", "item_type": "grammar_mcq", "sequence_index": 9,
-        "prompt_text": "We _____ in this city since 2015.",
-        "options": ["live", "are living", "have been living", "lived"], "correct_answer": "have been living", "difficulty": "medium"
+        "id": "sec-c-g-8",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 8,
+        "prompt_text": "He ___ his keys somewhere.",
+        "options": ["lose", "loses", "has lost", "losing"],
+        "correct_answer": "has lost",
+        "difficulty": "medium"
+    },
+    # 2. Tenses (8 questions)
+    {
+        "id": "sec-c-g-9",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 9,
+        "prompt_text": "I ___ my work by 6 PM yesterday.",
+        "options": ["finish", "finished", "had finished", "have finished"],
+        "correct_answer": "had finished",
+        "difficulty": "medium"
     },
     {
-        "id": "sec-c-g-10", "section": "C", "item_type": "grammar_mcq", "sequence_index": 10,
-        "prompt_text": "Next year at this time, I _____ in college.",
-        "options": ["will study", "will be studying", "studied", "have studied"], "correct_answer": "will be studying", "difficulty": "medium"
+        "id": "sec-c-g-10",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 10,
+        "prompt_text": "She ___ for two hours when I arrived.",
+        "options": ["waits", "waited", "has waited", "had been waiting"],
+        "correct_answer": "had been waiting",
+        "difficulty": "medium"
     },
     {
-        "id": "sec-c-g-11", "section": "C", "item_type": "grammar_mcq", "sequence_index": 11,
-        "prompt_text": "When the lights went out, I _____ a book.",
-        "options": ["read", "was reading", "have read", "am reading"], "correct_answer": "was reading", "difficulty": "medium"
+        "id": "sec-c-g-11",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 11,
+        "prompt_text": "By next year, I ___ my degree.",
+        "options": ["complete", "completed", "will complete", "will have completed"],
+        "correct_answer": "will have completed",
+        "difficulty": "hard"
     },
     {
-        "id": "sec-c-g-12", "section": "C", "item_type": "grammar_mcq", "sequence_index": 12,
-        "prompt_text": "He usually _____ coffee in the morning.",
-        "options": ["drink", "drinks", "is drinking", "drank"], "correct_answer": "drinks", "difficulty": "easy"
+        "id": "sec-c-g-12",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 12,
+        "prompt_text": "They ___ the project next month.",
+        "options": ["finish", "finished", "will finish", "have finished"],
+        "correct_answer": "will finish",
+        "difficulty": "easy"
     },
     {
-        "id": "sec-c-g-13", "section": "C", "item_type": "grammar_mcq", "sequence_index": 13,
-        "prompt_text": "I will call you as soon as I _____ home.",
-        "options": ["arrive", "will arrive", "arrived", "am arriving"], "correct_answer": "arrive", "difficulty": "medium"
+        "id": "sec-c-g-13",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 13,
+        "prompt_text": "He ___ in this company for five years.",
+        "options": ["works", "worked", "has worked", "is working"],
+        "correct_answer": "has worked",
+        "difficulty": "medium"
     },
     {
-        "id": "sec-c-g-14", "section": "C", "item_type": "grammar_mcq", "sequence_index": 14,
-        "prompt_text": "She promised that she _____ me the next day.",
-        "options": ["helps", "will help", "would help", "has helped"], "correct_answer": "would help", "difficulty": "hard"
-    },
-
-    # Articles (15-20)
-    {
-        "id": "sec-c-g-15", "section": "C", "item_type": "grammar_mcq", "sequence_index": 15,
-        "prompt_text": "Honesty is _____ best policy.",
-        "options": ["a", "an", "the", "no article needed"], "correct_answer": "the", "difficulty": "easy"
+        "id": "sec-c-g-14",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 14,
+        "prompt_text": "The train ___ before we reached the station.",
+        "options": ["left", "leaves", "had left", "has left"],
+        "correct_answer": "had left",
+        "difficulty": "medium"
     },
     {
-        "id": "sec-c-g-16", "section": "C", "item_type": "grammar_mcq", "sequence_index": 16,
-        "prompt_text": "Copper is _____ useful metal.",
-        "options": ["a", "an", "the", "no article needed"], "correct_answer": "a", "difficulty": "medium"
+        "id": "sec-c-g-15",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 15,
+        "prompt_text": "I ___ him since last week.",
+        "options": ["don't see", "didn't see", "haven't seen", "hadn't seen"],
+        "correct_answer": "haven't seen",
+        "difficulty": "medium"
     },
     {
-        "id": "sec-c-g-17", "section": "C", "item_type": "grammar_mcq", "sequence_index": 17,
-        "prompt_text": "He met _____ European tourist at the museum.",
-        "options": ["a", "an", "the", "no article needed"], "correct_answer": "a", "difficulty": "medium"
+        "id": "sec-c-g-16",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 16,
+        "prompt_text": "She ___ her homework when her friend called.",
+        "options": ["does", "did", "was doing", "has done"],
+        "correct_answer": "was doing",
+        "difficulty": "medium"
+    },
+    # 3. Articles (6 questions)
+    {
+        "id": "sec-c-g-17",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 17,
+        "prompt_text": "He is ___ honest man.",
+        "options": ["a", "an", "the", "no article"],
+        "correct_answer": "an",
+        "difficulty": "easy"
     },
     {
-        "id": "sec-c-g-18", "section": "C", "item_type": "grammar_mcq", "sequence_index": 18,
-        "prompt_text": "They crossed _____ Atlantic Ocean by ship.",
-        "options": ["a", "an", "the", "no article needed"], "correct_answer": "the", "difficulty": "easy"
+        "id": "sec-c-g-18",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 18,
+        "prompt_text": "___ Himalayas are the highest mountains.",
+        "options": ["A", "An", "The", "No article"],
+        "correct_answer": "The",
+        "difficulty": "easy"
     },
     {
-        "id": "sec-c-g-19", "section": "C", "item_type": "grammar_mcq", "sequence_index": 19,
-        "prompt_text": "_____ Mount Everest is the highest peak in the world.",
-        "options": ["A", "An", "The", "No article needed"], "correct_answer": "No article needed", "difficulty": "medium"
+        "id": "sec-c-g-19",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 19,
+        "prompt_text": "She plays ___ piano beautifully.",
+        "options": ["a", "an", "the", "no article"],
+        "correct_answer": "the",
+        "difficulty": "easy"
     },
     {
-        "id": "sec-c-g-20", "section": "C", "item_type": "grammar_mcq", "sequence_index": 20,
-        "prompt_text": "She wants to become _____ engineer.",
-        "options": ["a", "an", "the", "no article needed"], "correct_answer": "an", "difficulty": "easy"
+        "id": "sec-c-g-20",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 20,
+        "prompt_text": "I need ___ information about the course.",
+        "options": ["a", "an", "the", "no article"],
+        "correct_answer": "no article",
+        "difficulty": "medium"
     },
-
-    # Voice Change (21-27)
     {
-        "id": "sec-c-g-21", "section": "C", "item_type": "grammar_mcq", "sequence_index": 21,
-        "prompt_text": "Passive of: 'The chef prepares delicious meals.'",
+        "id": "sec-c-g-21",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 21,
+        "prompt_text": "He gave me ___ useful advice.",
+        "options": ["a", "an", "the", "no article"],
+        "correct_answer": "no article",
+        "difficulty": "medium"
+    },
+    {
+        "id": "sec-c-g-22",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 22,
+        "prompt_text": "She is ___ best student in the class.",
+        "options": ["a", "an", "the", "no article"],
+        "correct_answer": "the",
+        "difficulty": "easy"
+    },
+    # 4. Voice Change (6 questions)
+    {
+        "id": "sec-c-g-23",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 23,
+        "prompt_text": 'Active: "They are building a new bridge." Passive:',
         "options": [
-            "Delicious meals are prepared by the chef.",
-            "Delicious meals were prepared by the chef.",
-            "Delicious meals have been prepared by the chef.",
-            "Delicious meals are being prepared by the chef."
+            "A new bridge is being built by them.",
+            "A new bridge was built by them.",
+            "A new bridge is built by them.",
+            "A new bridge has been built by them."
         ],
-        "correct_answer": "Delicious meals are prepared by the chef.", "difficulty": "easy"
+        "correct_answer": "A new bridge is being built by them.",
+        "difficulty": "medium"
     },
     {
-        "id": "sec-c-g-22", "section": "C", "item_type": "grammar_mcq", "sequence_index": 22,
-        "prompt_text": "Passive of: 'They built the bridge in 1995.'",
+        "id": "sec-c-g-24",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 24,
+        "prompt_text": 'Active: "She will write a letter." Passive:',
         "options": [
-            "The bridge is built in 1995.",
-            "The bridge was built in 1995.",
-            "The bridge had built in 1995.",
-            "The bridge was building in 1995."
+            "A letter will be written by her.",
+            "A letter is written by her.",
+            "A letter was written by her.",
+            "A letter has been written by her."
         ],
-        "correct_answer": "The bridge was built in 1995.", "difficulty": "easy"
+        "correct_answer": "A letter will be written by her.",
+        "difficulty": "medium"
     },
     {
-        "id": "sec-c-g-23", "section": "C", "item_type": "grammar_mcq", "sequence_index": 23,
-        "prompt_text": "Passive of: 'Someone is repairing the car.'",
+        "id": "sec-c-g-25",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 25,
+        "prompt_text": 'Passive: "The cake was baked by Mary." Active:',
         "options": [
-            "The car is repaired.",
-            "The car was repaired.",
-            "The car is being repaired.",
-            "The car has been repaired."
+            "Mary bakes the cake.",
+            "Mary baked the cake.",
+            "Mary is baking the cake.",
+            "Mary has baked the cake."
         ],
-        "correct_answer": "The car is being repaired.", "difficulty": "medium"
+        "correct_answer": "Mary baked the cake.",
+        "difficulty": "medium"
     },
     {
-        "id": "sec-c-g-24", "section": "C", "item_type": "grammar_mcq", "sequence_index": 24,
-        "prompt_text": "Passive of: 'Who wrote Hamlet?'",
+        "id": "sec-c-g-26",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 26,
+        "prompt_text": 'Active: "The teacher teaches English." Passive:',
         "options": [
-            "By whom Hamlet was written?",
-            "By whom was Hamlet written?",
-            "Who was Hamlet written by?",
-            "Hamlet was written by whom?"
+            "English is taught by the teacher.",
+            "English was taught by the teacher.",
+            "English has been taught by the teacher.",
+            "English will be taught by the teacher."
         ],
-        "correct_answer": "By whom was Hamlet written?", "difficulty": "medium"
+        "correct_answer": "English is taught by the teacher.",
+        "difficulty": "easy"
     },
     {
-        "id": "sec-c-g-25", "section": "C", "item_type": "grammar_mcq", "sequence_index": 25,
-        "prompt_text": "Passive of: 'Open the gate.'",
+        "id": "sec-c-g-27",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 27,
+        "prompt_text": 'Passive: "The letter has been written by John." Active:',
         "options": [
-            "Let the gate open.",
-            "Let the gate be opened.",
-            "The gate should open.",
-            "Open should be the gate."
+            "John writes the letter.",
+            "John wrote the letter.",
+            "John has written the letter.",
+            "John will write the letter."
         ],
-        "correct_answer": "Let the gate be opened.", "difficulty": "medium"
+        "correct_answer": "John has written the letter.",
+        "difficulty": "medium"
     },
     {
-        "id": "sec-c-g-26", "section": "C", "item_type": "grammar_mcq", "sequence_index": 26,
-        "prompt_text": "Passive of: 'She has completed the report.'",
+        "id": "sec-c-g-28",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 28,
+        "prompt_text": 'Active: "They completed the project." Passive:',
         "options": [
-            "The report is completed by her.",
-            "The report was completed by her.",
-            "The report has been completed by her.",
-            "The report had been completed by her."
+            "The project is completed by them.",
+            "The project was completed by them.",
+            "The project has been completed by them.",
+            "The project will be completed by them."
         ],
-        "correct_answer": "The report has been completed by her.", "difficulty": "easy"
+        "correct_answer": "The project was completed by them.",
+        "difficulty": "easy"
+    },
+    # 5. Mixed Grammar (6 questions)
+    {
+        "id": "sec-c-g-29",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 29,
+        "prompt_text": "She is good ___ mathematics.",
+        "options": ["in", "at", "on", "with"],
+        "correct_answer": "at",
+        "difficulty": "easy"
     },
     {
-        "id": "sec-c-g-27", "section": "C", "item_type": "grammar_mcq", "sequence_index": 27,
-        "prompt_text": "Active of: 'The cake was eaten by the children.'",
-        "options": [
-            "The children eat the cake.",
-            "The children ate the cake.",
-            "The children have eaten the cake.",
-            "The children were eating the cake."
-        ],
-        "correct_answer": "The children ate the cake.", "difficulty": "easy"
+        "id": "sec-c-g-30",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 30,
+        "prompt_text": "They arrived ___ the airport on time.",
+        "options": ["in", "at", "on", "to"],
+        "correct_answer": "at",
+        "difficulty": "easy"
+    },
+    {
+        "id": "sec-c-g-31",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 31,
+        "prompt_text": "Neither John nor his friends ___ coming.",
+        "options": ["is", "are", "was", "were"],
+        "correct_answer": "are",
+        "difficulty": "medium"
+    },
+    {
+        "id": "sec-c-g-32",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 32,
+        "prompt_text": "The team ___ playing well today.",
+        "options": ["is", "are", "was", "were"],
+        "correct_answer": "is",
+        "difficulty": "easy"
+    },
+    {
+        "id": "sec-c-g-33",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 33,
+        "prompt_text": "If I ___ rich, I would travel the world.",
+        "options": ["am", "was", "were", "be"],
+        "correct_answer": "were",
+        "difficulty": "medium"
+    },
+    {
+        "id": "sec-c-g-34",
+        "section": "C",
+        "item_type": "grammar_mcq",
+        "sequence_index": 34,
+        "prompt_text": "She speaks English ___ than her brother.",
+        "options": ["good", "better", "best", "well"],
+        "correct_answer": "better",
+        "difficulty": "easy"
     },
 
-    # Mixed / Prepositions / Subject-Verb Agreement (28-34)
+    # ==================== SECTION D: Listening Comprehension ====================
+    # Passage 1: Climate Change and Global Warming
     {
-        "id": "sec-c-g-28", "section": "C", "item_type": "grammar_mcq", "sequence_index": 28,
-        "prompt_text": "She is interested _____ learning foreign languages.",
-        "options": ["on", "at", "in", "with"], "correct_answer": "in", "difficulty": "easy"
+        "id": "sec-d-p-1",
+        "section": "D",
+        "item_type": "listening_comprehension",
+        "sequence_index": 1,
+        "passage_group_id": "passage-1",
+        "prompt_text": "Climate Change and Global Warming\n\nClimate change represents one of the most pressing challenges facing humanity today. Rising global temperatures are causing ice caps to melt, sea levels to rise, and weather patterns to become increasingly unpredictable. Scientists worldwide agree that human activities, particularly the burning of fossil fuels and deforestation, are the primary drivers of this phenomenon. The consequences are far-reaching, affecting ecosystems, agriculture, and human settlements. Immediate action is required to reduce greenhouse gas emissions and transition to renewable energy sources. International cooperation and policy reforms are essential to mitigate the worst effects of climate change and ensure a sustainable future for coming generations.",
+        "difficulty": "medium"
     },
     {
-        "id": "sec-c-g-29", "section": "C", "item_type": "grammar_mcq", "sequence_index": 29,
-        "prompt_text": "Neither the manager nor the employees _____ present at the meeting.",
-        "options": ["was", "were", "is", "be"], "correct_answer": "were", "difficulty": "medium"
+        "id": "sec-d-p-1-q-1",
+        "section": "D",
+        "item_type": "listening_comprehension",
+        "sequence_index": 2,
+        "passage_group_id": "passage-1",
+        "prompt_text": "What is the main topic of the passage?",
+        "options": ["Technology", "Climate Change", "Agriculture", "Energy"],
+        "correct_answer": "Climate Change",
+        "difficulty": "easy"
     },
     {
-        "id": "sec-c-g-30", "section": "C", "item_type": "grammar_mcq", "sequence_index": 30,
-        "prompt_text": "He congratulated me _____ my success.",
-        "options": ["for", "on", "at", "about"], "correct_answer": "on", "difficulty": "medium"
+        "id": "sec-d-p-1-q-2",
+        "section": "D",
+        "item_type": "listening_comprehension",
+        "sequence_index": 3,
+        "passage_group_id": "passage-1",
+        "prompt_text": "According to the passage, what is the primary cause of climate change?",
+        "options": ["Natural disasters", "Human activities", "Solar radiation", "Ocean currents"],
+        "correct_answer": "Human activities",
+        "difficulty": "easy"
     },
     {
-        "id": "sec-c-g-31", "section": "C", "item_type": "grammar_mcq", "sequence_index": 31,
-        "prompt_text": "Each of the students _____ given a certificate.",
-        "options": ["were", "was", "have been", "are"], "correct_answer": "was", "difficulty": "medium"
+        "id": "sec-d-p-1-q-3",
+        "section": "D",
+        "item_type": "listening_comprehension",
+        "sequence_index": 4,
+        "passage_group_id": "passage-1",
+        "prompt_text": "What does the passage suggest is necessary to address climate change?",
+        "options": ["More research", "International cooperation", "Population control", "Space exploration"],
+        "correct_answer": "International cooperation",
+        "difficulty": "medium"
     },
     {
-        "id": "sec-c-g-32", "section": "C", "item_type": "grammar_mcq", "sequence_index": 32,
-        "prompt_text": "Despite _____ hard, he failed the examination.",
-        "options": ["study", "of studying", "studying", "he studied"], "correct_answer": "studying", "difficulty": "hard"
-    },
-    {
-        "id": "sec-c-g-33", "section": "C", "item_type": "grammar_mcq", "sequence_index": 33,
-        "prompt_text": "The news _____ better than we expected.",
-        "options": ["are", "is", "were", "have been"], "correct_answer": "is", "difficulty": "medium"
-    },
-    {
-        "id": "sec-c-g-34", "section": "C", "item_type": "grammar_mcq", "sequence_index": 34,
-        "prompt_text": "Hardly had I entered the room _____ the phone rang.",
-        "options": ["than", "when", "then", "after"], "correct_answer": "when", "difficulty": "hard"
-    },
-
-    # ==================== SECTION D: Listening Comprehension (4 Passages, 16 MCQs) ====================
-    # Passage 1
-    {
-        "id": "sec-d-p1", "section": "D", "item_type": "listening_comprehension", "sequence_index": 1,
-        "passage_group_id": "p1",
-        "prompt_text": "Passage 1: Global Climate Research\nRecent satellite measurements indicate that polar ice sheets are melting at an accelerated pace. Climate scientists emphasize that reducing greenhouse gas emissions over the next decade is critical to preventing sea level rise.",
-        "options": None, "correct_answer": None, "difficulty": "medium"
-    },
-    {
-        "id": "sec-d-p1-q1", "section": "D", "item_type": "listening_comprehension", "sequence_index": 2,
-        "passage_group_id": "p1",
-        "prompt_text": "What do recent satellite measurements show regarding polar ice sheets?",
-        "options": ["They are growing thicker.", "They are melting at an accelerated pace.", "They remain unchanged.", "They are shifting southward."],
-        "correct_answer": "They are melting at an accelerated pace.", "difficulty": "medium"
-    },
-    {
-        "id": "sec-d-p1-q2", "section": "D", "item_type": "listening_comprehension", "sequence_index": 3,
-        "passage_group_id": "p1",
-        "prompt_text": "What action do climate scientists emphasize as critical over the next decade?",
-        "options": ["Building coastal walls.", "Reducing greenhouse gas emissions.", "Increasing satellite launches.", "Planting polar forests."],
-        "correct_answer": "Reducing greenhouse gas emissions.", "difficulty": "medium"
-    },
-    {
-        "id": "sec-d-p1-q3", "section": "D", "item_type": "listening_comprehension", "sequence_index": 4,
-        "passage_group_id": "p1",
-        "prompt_text": "What is the primary danger associated with accelerated ice melting?",
-        "options": ["Global cooling.", "Sea level rise.", "Volcanic eruptions.", "Reduced solar radiation."],
-        "correct_answer": "Sea level rise.", "difficulty": "easy"
-    },
-    {
-        "id": "sec-d-p1-q4", "section": "D", "item_type": "listening_comprehension", "sequence_index": 5,
-        "passage_group_id": "p1",
-        "prompt_text": "How was the data regarding polar ice sheets collected?",
-        "options": ["Through ocean buoys.", "Via satellite measurements.", "By weather balloons.", "Through submarine sonar."],
-        "correct_answer": "Via satellite measurements.", "difficulty": "medium"
+        "id": "sec-d-p-1-q-4",
+        "section": "D",
+        "item_type": "listening_comprehension",
+        "sequence_index": 5,
+        "passage_group_id": "passage-1",
+        "prompt_text": "What is the tone of the passage?",
+        "options": ["Humorous", "Urgent and serious", "Optimistic", "Indifferent"],
+        "correct_answer": "Urgent and serious",
+        "difficulty": "medium"
     },
 
-    # Passage 2
+    # Passage 2: The Digital Revolution in Education
     {
-        "id": "sec-d-p2", "section": "D", "item_type": "listening_comprehension", "sequence_index": 6,
-        "passage_group_id": "p2",
-        "prompt_text": "Passage 2: The Invention of Printing\nJohannes Gutenberg invented the movable type printing press around 1440 in Mainz, Germany. This breakthrough democratized access to knowledge, sparking widespread literacy and the Renaissance across Europe.",
-        "options": None, "correct_answer": None, "difficulty": "medium"
+        "id": "sec-d-p-2",
+        "section": "D",
+        "item_type": "listening_comprehension",
+        "sequence_index": 6,
+        "passage_group_id": "passage-2",
+        "prompt_text": "The Digital Revolution in Education\n\nThe integration of technology in education has transformed traditional learning methods dramatically. Online platforms, virtual classrooms, and digital resources have made education more accessible to students worldwide. During the recent pandemic, educational institutions rapidly adopted remote learning technologies, demonstrating the resilience and adaptability of the education sector. However, this digital shift has also highlighted the digital divide, where students without access to technology or reliable internet face significant disadvantages. Educators are now exploring hybrid models that combine the best of both traditional and digital approaches. The future of education lies in leveraging technology while ensuring equitable access for all learners.",
+        "difficulty": "medium"
     },
     {
-        "id": "sec-d-p2-q1", "section": "D", "item_type": "listening_comprehension", "sequence_index": 7,
-        "passage_group_id": "p2",
-        "prompt_text": "Who invented the movable type printing press?",
-        "options": ["Leonardo da Vinci", "Johannes Gutenberg", "Isaac Newton", "Galileo Galilei"],
-        "correct_answer": "Johannes Gutenberg", "difficulty": "easy"
+        "id": "sec-d-p-2-q-5",
+        "section": "D",
+        "item_type": "listening_comprehension",
+        "sequence_index": 7,
+        "passage_group_id": "passage-2",
+        "prompt_text": "What is the main focus of this passage?",
+        "options": ["Pandemic response", "Technology in education", "Internet access", "Teacher training"],
+        "correct_answer": "Technology in education",
+        "difficulty": "easy"
     },
     {
-        "id": "sec-d-p2-q2", "section": "D", "item_type": "listening_comprehension", "sequence_index": 8,
-        "passage_group_id": "p2",
-        "prompt_text": "Around which year was the printing press invented?",
-        "options": ["1250", "1340", "1440", "1540"],
-        "correct_answer": "1440", "difficulty": "easy"
+        "id": "sec-d-p-2-q-6",
+        "section": "D",
+        "item_type": "listening_comprehension",
+        "sequence_index": 8,
+        "passage_group_id": "passage-2",
+        "prompt_text": "What problem does the speaker highlight?",
+        "options": ["Lack of teachers", "Digital divide", "High costs", "Poor infrastructure"],
+        "correct_answer": "Digital divide",
+        "difficulty": "medium"
     },
     {
-        "id": "sec-d-p2-q3", "section": "D", "item_type": "listening_comprehension", "sequence_index": 9,
-        "passage_group_id": "p2",
-        "prompt_text": "In which city was the printing press developed?",
-        "options": ["Mainz, Germany", "Florence, Italy", "Paris, France", "London, England"],
-        "correct_answer": "Mainz, Germany", "difficulty": "medium"
+        "id": "sec-d-p-2-q-7",
+        "section": "D",
+        "item_type": "listening_comprehension",
+        "sequence_index": 9,
+        "passage_group_id": "passage-2",
+        "prompt_text": "According to the passage, what did the pandemic demonstrate?",
+        "options": ["Education is unnecessary", "Technology is expensive", "Education sector adaptability", "Students prefer online learning"],
+        "correct_answer": "Education sector adaptability",
+        "difficulty": "medium"
     },
     {
-        "id": "sec-d-p2-q4", "section": "D", "item_type": "listening_comprehension", "sequence_index": 10,
-        "passage_group_id": "p2",
-        "prompt_text": "What major historical movement was catalyzed by the printing press?",
-        "options": ["Industrial Revolution", "The Renaissance", "The Enlightenment", "The Bronze Age"],
-        "correct_answer": "The Renaissance", "difficulty": "medium"
-    },
-
-    # Passage 3
-    {
-        "id": "sec-d-p3", "section": "D", "item_type": "listening_comprehension", "sequence_index": 11,
-        "passage_group_id": "p3",
-        "prompt_text": "Passage 3: Deep Sea Biodiversity\nHydrothermal vents on the ocean floor support unique ecosystems thriving without sunlight. Bacteria utilize chemosynthesis using hydrogen sulfide, sustaining tube worms, giant clams, and blind crabs.",
-        "options": None, "correct_answer": None, "difficulty": "hard"
-    },
-    {
-        "id": "sec-d-p3-q1", "section": "D", "item_type": "listening_comprehension", "sequence_index": 12,
-        "passage_group_id": "p3",
-        "prompt_text": "What process do hydrothermal vent bacteria use to produce energy without sunlight?",
-        "options": ["Photosynthesis", "Chemosynthesis", "Fermentation", "Respiration"],
-        "correct_answer": "Chemosynthesis", "difficulty": "hard"
-    },
-    {
-        "id": "sec-d-p3-q2", "section": "D", "item_type": "listening_comprehension", "sequence_index": 13,
-        "passage_group_id": "p3",
-        "prompt_text": "Which chemical compound do the bacteria utilize?",
-        "options": ["Carbon dioxide", "Sodium chloride", "Hydrogen sulfide", "Methane gas"],
-        "correct_answer": "Hydrogen sulfide", "difficulty": "hard"
-    },
-    {
-        "id": "sec-d-p3-q3", "section": "D", "item_type": "listening_comprehension", "sequence_index": 14,
-        "passage_group_id": "p3",
-        "prompt_text": "Which organism is NOT mentioned as living near hydrothermal vents?",
-        "options": ["Tube worms", "Giant clams", "Blind crabs", "Sea turtles"],
-        "correct_answer": "Sea turtles", "difficulty": "medium"
-    },
-    {
-        "id": "sec-d-p3-q4", "section": "D", "item_type": "listening_comprehension", "sequence_index": 15,
-        "passage_group_id": "p3",
-        "prompt_text": "What makes hydrothermal vent ecosystems particularly unique?",
-        "options": ["They exist near coral reefs.", "They thrive completely without sunlight.", "They migrate seasonally.", "They are freshwater environments."],
-        "correct_answer": "They thrive completely without sunlight.", "difficulty": "medium"
+        "id": "sec-d-p-2-q-8",
+        "section": "D",
+        "item_type": "listening_comprehension",
+        "sequence_index": 10,
+        "passage_group_id": "passage-2",
+        "prompt_text": "What does the passage suggest about the future of education?",
+        "options": ["Fully online", "Traditional only", "Hybrid approach", "Uncertain"],
+        "correct_answer": "Hybrid approach",
+        "difficulty": "medium"
     },
 
-    # Passage 4
+    # Passage 3: The Importance of Mental Health Awareness
     {
-        "id": "sec-d-p4", "section": "D", "item_type": "listening_comprehension", "sequence_index": 16,
-        "passage_group_id": "p4",
-        "prompt_text": "Passage 4: Artificial Intelligence in Medicine\nMedical diagnostic AI models analyze radiological images such as X-rays and MRIs with remarkable precision. Radiologists use these tools as decision-support systems to detect early-stage abnormalities.",
-        "options": None, "correct_answer": None, "difficulty": "medium"
+        "id": "sec-d-p-3",
+        "section": "D",
+        "item_type": "listening_comprehension",
+        "sequence_index": 11,
+        "passage_group_id": "passage-3",
+        "prompt_text": "The Importance of Mental Health Awareness\n\nMental health has emerged as a critical public health concern in recent years. The stigma surrounding mental illness is gradually diminishing as more people speak openly about their experiences. Workplace stress, social media pressure, and the fast-paced modern lifestyle contribute significantly to mental health challenges. Organizations are increasingly recognizing the importance of employee well-being and implementing mental health support programs. Early intervention and access to professional help can make a substantial difference in treatment outcomes. Public awareness campaigns and education are essential to normalize conversations about mental health and encourage people to seek help without fear of judgment.",
+        "difficulty": "medium"
     },
     {
-        "id": "sec-d-p4-q1", "section": "D", "item_type": "listening_comprehension", "sequence_index": 17,
-        "passage_group_id": "p4",
-        "prompt_text": "What type of images do medical diagnostic AI models analyze?",
-        "options": ["Ultrasonic echoes", "Radiological images like X-rays and MRIs", "Microscopic slide cultures", "Thermal infrared scans"],
-        "correct_answer": "Radiological images like X-rays and MRIs", "difficulty": "easy"
+        "id": "sec-d-p-3-q-9",
+        "section": "D",
+        "item_type": "listening_comprehension",
+        "sequence_index": 12,
+        "passage_group_id": "passage-3",
+        "prompt_text": "What is the central theme of the passage?",
+        "options": ["Workplace productivity", "Mental health awareness", "Social media effects", "Healthcare systems"],
+        "correct_answer": "Mental health awareness",
+        "difficulty": "easy"
     },
     {
-        "id": "sec-d-p4-q2", "section": "D", "item_type": "listening_comprehension", "sequence_index": 18,
-        "passage_group_id": "p4",
-        "prompt_text": "How do radiologists primarily utilize these AI tools?",
-        "options": ["As replacement doctors", "As decision-support systems", "For patient billing", "For surgical automation"],
-        "correct_answer": "As decision-support systems", "difficulty": "medium"
+        "id": "sec-d-p-3-q-10",
+        "section": "D",
+        "item_type": "listening_comprehension",
+        "sequence_index": 13,
+        "passage_group_id": "passage-3",
+        "prompt_text": "What change does the passage mention regarding mental health?",
+        "options": ["Increasing stigma", "Decreasing stigma", "No change", "More confusion"],
+        "correct_answer": "Decreasing stigma",
+        "difficulty": "medium"
     },
     {
-        "id": "sec-d-p4-q3", "section": "D", "item_type": "listening_comprehension", "sequence_index": 19,
-        "passage_group_id": "p4",
-        "prompt_text": "What is a primary benefit of AI in medical image analysis?",
-        "options": ["Detecting early-stage abnormalities", "Eliminating hospital waiting rooms", "Manufacturing pharmaceuticals", "Performing physical examinations"],
-        "correct_answer": "Detecting early-stage abnormalities", "difficulty": "easy"
+        "id": "sec-d-p-3-q-11",
+        "section": "D",
+        "item_type": "listening_comprehension",
+        "sequence_index": 14,
+        "passage_group_id": "passage-3",
+        "prompt_text": "What are organizations doing according to the passage?",
+        "options": ["Ignoring the issue", "Implementing support programs", "Reducing workload", "Hiring more staff"],
+        "correct_answer": "Implementing support programs",
+        "difficulty": "medium"
     },
     {
-        "id": "sec-d-p4-q4", "section": "D", "item_type": "listening_comprehension", "sequence_index": 20,
-        "passage_group_id": "p4",
-        "prompt_text": "Which medical professionals are mentioned as working alongside AI tools?",
-        "options": ["Pharmacists", "Surgeons", "Radiologists", "Pediatricians"],
-        "correct_answer": "Radiologists", "difficulty": "easy"
+        "id": "sec-d-p-3-q-12",
+        "section": "D",
+        "item_type": "listening_comprehension",
+        "sequence_index": 15,
+        "passage_group_id": "passage-3",
+        "prompt_text": "What does the passage emphasize as important?",
+        "options": ["Medication only", "Early intervention", "Isolation", "Self-treatment"],
+        "correct_answer": "Early intervention",
+        "difficulty": "medium"
+    },
+
+    # Passage 4: Sustainable Business Practices
+    {
+        "id": "sec-d-p-4",
+        "section": "D",
+        "item_type": "listening_comprehension",
+        "sequence_index": 16,
+        "passage_group_id": "passage-4",
+        "prompt_text": "Sustainable Business Practices\n\nModern businesses are increasingly adopting sustainable practices to reduce their environmental impact and meet consumer expectations. Corporate social responsibility has evolved from a marketing strategy to a core business principle. Companies are investing in renewable energy, reducing waste, and implementing circular economy models. Consumers, particularly younger generations, are making purchasing decisions based on a company's environmental and social commitments. This shift is driving innovation in product design, supply chain management, and business operations. While sustainability initiatives may require initial investments, they often lead to long-term cost savings and enhanced brand reputation. The transition to sustainable business practices is not just ethically important but also economically advantageous.",
+        "difficulty": "medium"
+    },
+    {
+        "id": "sec-d-p-4-q-13",
+        "section": "D",
+        "item_type": "listening_comprehension",
+        "sequence_index": 17,
+        "passage_group_id": "passage-4",
+        "prompt_text": "What is the main subject of the passage?",
+        "options": ["Marketing strategies", "Sustainable business practices", "Consumer behavior", "Product design"],
+        "correct_answer": "Sustainable business practices",
+        "difficulty": "easy"
+    },
+    {
+        "id": "sec-d-p-4-q-14",
+        "section": "D",
+        "item_type": "listening_comprehension",
+        "sequence_index": 18,
+        "passage_group_id": "passage-4",
+        "prompt_text": "How has corporate social responsibility changed?",
+        "options": ["Become less important", "Evolved to core principle", "Remained the same", "Been abandoned"],
+        "correct_answer": "Evolved to core principle",
+        "difficulty": "medium"
+    },
+    {
+        "id": "sec-d-p-4-q-15",
+        "section": "D",
+        "item_type": "listening_comprehension",
+        "sequence_index": 19,
+        "passage_group_id": "passage-4",
+        "prompt_text": "What influences consumer purchasing decisions according to the passage?",
+        "options": ["Price only", "Brand name", "Environmental commitments", "Advertising"],
+        "correct_answer": "Environmental commitments",
+        "difficulty": "medium"
+    },
+    {
+        "id": "sec-d-p-4-q-16",
+        "section": "D",
+        "item_type": "listening_comprehension",
+        "sequence_index": 20,
+        "passage_group_id": "passage-4",
+        "prompt_text": "What does the passage conclude about sustainability?",
+        "options": ["Too expensive", "Ethically and economically beneficial", "Only for large companies", "Temporary trend"],
+        "correct_answer": "Ethically and economically beneficial",
+        "difficulty": "medium"
     }
 ]
 
-def seed_full_assessment(db: Session):
-    """Populates all 4 section items (A, B, C, D) if unseeded."""
-    count = db.query(AssessmentItem).count()
-    # Check if section A items exist
-    sec_a_count = db.query(AssessmentItem).filter(AssessmentItem.section == "A").count()
-    if sec_a_count == 0:
-        # Wipe old demo seed items if any to avoid ID collisions
-        db.query(AssessmentItem).delete()
-        db.commit()
 
-        for item_data in FULL_SEED_ITEMS:
-            item = AssessmentItem(**item_data)
+def seed_full_assessment(db: Session):
+    """Idempotently seeds all assessment items verbatim from the reference suite."""
+    for item_data in FULL_SEED_ITEMS:
+        existing = db.query(AssessmentItem).filter(AssessmentItem.id == item_data["id"]).first()
+        if not existing:
+            item = AssessmentItem(
+                id=item_data["id"],
+                section=item_data["section"],
+                item_type=item_data["item_type"],
+                sequence_index=item_data["sequence_index"],
+                prompt_text=item_data["prompt_text"],
+                options=item_data.get("options"),
+                correct_answer=item_data.get("correct_answer"),
+                hints=item_data.get("hints"),
+                time_limit_seconds=item_data.get("time_limit_seconds"),
+                passage_group_id=item_data.get("passage_group_id"),
+                difficulty=item_data.get("difficulty")
+            )
             db.add(item)
-        db.commit()
+        else:
+            # Update existing to ensure exact match
+            existing.section = item_data["section"]
+            existing.item_type = item_data["item_type"]
+            existing.sequence_index = item_data["sequence_index"]
+            existing.prompt_text = item_data["prompt_text"]
+            existing.options = item_data.get("options")
+            existing.correct_answer = item_data.get("correct_answer")
+            existing.hints = item_data.get("hints")
+            existing.time_limit_seconds = item_data.get("time_limit_seconds")
+            existing.passage_group_id = item_data.get("passage_group_id")
+            existing.difficulty = item_data.get("difficulty")
+    db.commit()

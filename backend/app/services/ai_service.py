@@ -89,3 +89,94 @@ def detect_distraction_risk(distractions_logged: int, planned_minutes: int, actu
     if actual_minutes < planned_minutes * 0.5:
         return "session_cut_short"
     return "on_track"
+
+
+def summarize_assessment_session(
+    section_c_score: float,
+    section_d_score: float,
+    speaking_items_count: int,
+    tab_switch_count: int,
+    candidate_name: str = "Candidate"
+) -> Dict[str, Any]:
+    """
+    Produces a constructive, non-diagnostic study pacing summary based on auto-graded sections
+    and recorded speaking submissions. Never frames results as a medical or clinical diagnosis.
+    """
+    auto_graded_avg = round((section_c_score + section_d_score) / 2.0, 1)
+
+    # Calculate recommended profile parameters based on performance
+    if auto_graded_avg >= 80:
+        focus_span = 30
+        content_style = "mixed"
+        difficulty = "adaptive"
+    elif auto_graded_avg >= 60:
+        focus_span = 25
+        content_style = "visual"
+        difficulty = "medium"
+    else:
+        focus_span = 20
+        content_style = "visual"
+        difficulty = "easy"
+
+    fallback_summary = (
+        f"{candidate_name} completed the 4-section English proficiency assessment. "
+        f"Grammar accuracy reached {section_c_score}%, and listening comprehension achieved {section_d_score}%. "
+        f"A total of {speaking_items_count} spoken audio responses were recorded and stored for review. "
+        f"Based on pacing and response consistency, an initial study block of {focus_span} minutes with "
+        f"{content_style} study aids is recommended."
+    )
+
+    if client is None or not settings.openai_api_key:
+        return {
+            "auto_graded_score": auto_graded_avg,
+            "ai_summary": fallback_summary,
+            "recommended_focus_span_minutes": focus_span,
+            "recommended_content_style": content_style,
+            "recommended_difficulty_level": difficulty
+        }
+
+    try:
+        system = (
+            "You are an educational learning coach analyzing an English proficiency assessment for a student. "
+            "Write a concise, encouraging 2-3 sentence performance summary. "
+            "CRITICAL: Never use medical, clinical, or diagnostic terminology. "
+            "Focus purely on language mastery, study pacing, and recommended revision techniques. "
+            "Respond ONLY as JSON: {summary: string, recommended_focus_span_minutes: int, "
+            "recommended_content_style: string, recommended_difficulty_level: string}"
+        )
+        user_prompt = (
+            f"Candidate Name: {candidate_name}\n"
+            f"Section C (Grammar Accuracy): {section_c_score}%\n"
+            f"Section D (Listening Comprehension): {section_d_score}%\n"
+            f"Speaking Items Recorded: {speaking_items_count}\n"
+            f"Tab Switch Proctoring Alerts: {tab_switch_count}\n"
+        )
+        raw = _call_llm(system, user_prompt)
+        parsed = json.loads(raw)
+        return {
+            "auto_graded_score": auto_graded_avg,
+            "ai_summary": parsed.get("summary", fallback_summary),
+            "recommended_focus_span_minutes": parsed.get("recommended_focus_span_minutes", focus_span),
+            "recommended_content_style": parsed.get("recommended_content_style", content_style),
+            "recommended_difficulty_level": parsed.get("recommended_difficulty_level", difficulty)
+        }
+    except Exception:
+        return {
+            "auto_graded_score": auto_graded_avg,
+            "ai_summary": fallback_summary,
+            "recommended_focus_span_minutes": focus_span,
+            "recommended_content_style": content_style,
+            "recommended_difficulty_level": difficulty
+        }
+
+
+class AIService:
+    simplify_study_material = staticmethod(simplify_study_material)
+    break_down_task = staticmethod(break_down_task)
+    generate_recommendations = staticmethod(generate_recommendations)
+    detect_distraction_risk = staticmethod(detect_distraction_risk)
+    summarize_assessment_session = staticmethod(summarize_assessment_session)
+
+
+ai_service = AIService()
+
