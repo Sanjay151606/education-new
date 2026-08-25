@@ -31,12 +31,18 @@ def get_current_user(
     try:
         # If a secret is provided, verify signature.
         if jwt_secret:
-            payload = jwt.decode(
-                token,
-                jwt_secret,
-                algorithms=[settings.jwt_algorithm],
-                options={"verify_aud": False},
+            # Guard against missing or placeholder Supabase JWT secret
+        if not jwt_secret or jwt_secret == "REPLACE_WITH_YOUR_SUPABASE_JWT_SECRET":
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Supabase JWT secret not configured. Set SUPABASE_JWT_SECRET in .env.",
             )
+        payload = jwt.decode(
+            token,
+            jwt_secret,
+            algorithms=[settings.jwt_algorithm],
+            options={"verify_aud": False},
+        )
         else:
             # Fallback for unconfigured dev environment (claims parsing without signature check)
             payload = jwt.get_unverified_claims(token)
