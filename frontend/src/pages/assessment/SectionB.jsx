@@ -2,394 +2,394 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { assessmentApi } from '../../services/api';
 import { useAudioRecorder } from '../../hooks/useAudioRecorder';
-import { useToast } from '../../context/ToastContext';
 import {
   Mic,
-  Square,
-  Clock,
-  ArrowRight,
-  Sparkles,
-  HelpCircle,
-  CheckCircle2,
+  MicOff,
   AlertTriangle,
-  Lightbulb,
+  CheckCircle2,
+  ArrowRight,
+  Clock,
+  UploadCloud,
   ShieldAlert,
-  Volume2,
+  ChevronDown,
+  ChevronUp,
+  HelpCircle,
+  Sparkles,
+  Flame
 } from 'lucide-react';
 
-export const SectionB = () => {
+export default function SectionB() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { addToast } = useToast();
 
-  const [sessionId, setSessionId] = useState(
-    location.state?.sessionId || sessionStorage.getItem('bg_assessment_session_id') || ''
-  );
-  const [items, setItems] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [phase, setPhase] = useState('prep'); // 'prep' (90s) or 'speaking' (60s)
-  const [prepTimeLeft, setPrepTimeLeft] = useState(90);
-  const [speakTimeLeft, setSpeakTimeLeft] = useState(60);
+  const sessionId =
+    location.state?.sessionId || sessionStorage.getItem('bg_assessment_session_id');
+
+  const [topics, setTopics] = useState([]);
+  const [currentIdx, setCurrentIdx] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Phases: 'prep' (90s) -> 'speak' (60s)
+  const [phase, setPhase] = useState('prep');
+  const [timeLeft, setTimeLeft] = useState(90);
+  const [showHints, setShowHints] = useState(true);
+  const [recordingDone, setRecordingDone] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadedMap, setUploadedMap] = useState({});
-  const [tabSwitchCount, setTabSwitchCount] = useState(0);
-  const [showWarning, setShowWarning] = useState(false);
+  const [warnings, setWarnings] = useState([]);
+  const [tabSwitches, setTabSwitches] = useState(0);
 
-  const prepTimerRef = useRef(null);
-  const speakTimerRef = useRef(null);
+  const { isRecording, startRecording, stopRecording, clearAudio } = useAudioRecorder();
+  const timerRef = useRef(null);
 
-  const {
-    isRecording,
-    recordingTime,
-    audioBlob,
-    startRecording,
-    stopRecording,
-    resetRecording,
-  } = useAudioRecorder();
-
-  const currentTopic = items[currentIndex] || null;
-
-  // 1. Fetch Section B items on mount
   useEffect(() => {
-    const fetchItems = async () => {
-      let activeSessionId = sessionId;
-      if (!activeSessionId) {
-        navigate('/assessment');
-        return;
-      }
+    if (!sessionId) {
+      navigate('/assessment');
+    }
+  }, [sessionId, navigate]);
 
+  // Load Section B topics
+  useEffect(() => {
+    const fetchTopics = async () => {
+      setIsLoading(true);
       try {
-        const res = await assessmentApi.getSection(activeSessionId, 'B');
-        setItems(res.data);
+        const res = await assessmentApi.getSection(sessionId, 'B');
+        setTopics(res.data || []);
       } catch (err) {
-        console.error('Failed to fetch Section B items:', err);
-        addToast('Error loading Section B topics.', 'error');
+        console.error('Error fetching Section B topics:', err);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchItems();
-  }, [sessionId, navigate, addToast]);
+    if (sessionId) {
+      fetchTopics();
+    }
+  }, [sessionId]);
 
-  // 2. Proctoring: Page Visibility API tab switch listener
+  // Proctoring tab switch
   useEffect(() => {
-    const handleVisibilityChange = async () => {
-      if (document.hidden && sessionId) {
-        setTabSwitchCount((prev) => prev + 1);
-        setShowWarning(true);
-        try {
-          await assessmentApi.recordTabSwitch(sessionId, {
-            warning_message: `Tab switch during Section B on topic ${currentIndex + 1}`,
-          });
-        } catch (err) {
-          console.error('Failed to record tab switch:', err);
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setTabSwitches((prev) => prev + 1);
+        const warningText = `Tab switch detected at ${new Date().toLocaleTimeString()}! Stay on this page.`;
+        setWarnings((prev) => [...prev, warningText]);
+
+        if (sessionId) {
+          assessmentApi.recordTabSwitch(sessionId, { reason: 'Section B tab switch' }).catch((e) =>
+            console.error('Failed to log tab switch:', e)
+          );
         }
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [sessionId, currentIndex]);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [sessionId]);
 
-  // 3. Topic switch initializer: Reset to 90s prep phase
+  const currentTopic = topics[currentIdx] || null;
+
+  // Reset phase and timer on topic change
   useEffect(() => {
     if (!currentTopic) return;
 
-    // Reset phases
     setPhase('prep');
-    setPrepTimeLeft(currentTopic.display_seconds || 90);
-    setSpeakTimeLeft(currentTopic.time_limit_seconds || 60);
-    resetRecording();
+    setTimeLeft(90);
+    setRecordingDone(false);
+    setShowHints(true);
+    clearAudio();
+  }, [currentIdx, currentTopic, clearAudio]);
 
-    if (prepTimerRef.current) clearInterval(prepTimerRef.current);
-    if (speakTimerRef.current) clearInterval(speakTimerRef.current);
-
-    prepTimerRef.current = setInterval(() => {
-      setPrepTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(prepTimerRef.current);
-          handleTransitionToSpeaking();
-          return 0;
+  // Countdown timer logic
+  useEffect(() => {
+    if (timeLeft > 0) {
+      timerRef.current = setTimeout(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+    } else {
+      // Time expired for current phase
+      if (phase === 'prep') {
+        // Transition to speaking phase
+        setPhase('speak');
+        setTimeLeft(60);
+      } else if (phase === 'speak') {
+        // Stop recording if running
+        if (isRecording) {
+          handleStopAndSubmit();
         }
-        return prev - 1;
-      });
-    }, 1000);
+      }
+    }
 
     return () => {
-      if (prepTimerRef.current) clearInterval(prepTimerRef.current);
-      if (speakTimerRef.current) clearInterval(speakTimerRef.current);
+      if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [currentIndex, currentTopic]);
+  }, [timeLeft, phase, isRecording]);
 
-  // Transition from Prep to Speaking Phase
-  const handleTransitionToSpeaking = () => {
-    if (prepTimerRef.current) clearInterval(prepTimerRef.current);
-    setPhase('speaking');
-    addToast('Preparation time ended. Begin speaking now! 🎙️', 'info');
-
-    // Automatically trigger speech recording
-    startRecording();
-
-    if (speakTimerRef.current) clearInterval(speakTimerRef.current);
-    speakTimerRef.current = setInterval(() => {
-      setSpeakTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(speakTimerRef.current);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+  const handleStartSpeakingNow = () => {
+    setPhase('speak');
+    setTimeLeft(60);
   };
 
-  // Auto-stop recording when speaking time runs out
-  useEffect(() => {
-    if (phase === 'speaking' && speakTimeLeft === 0 && isRecording) {
-      stopRecording();
-      addToast('Speaking time completed! Recording saved.', 'info');
-    }
-  }, [phase, speakTimeLeft, isRecording, stopRecording, addToast]);
+  const handleStartRecord = async () => {
+    await startRecording();
+  };
 
-  // Upload captured audio for current topic
-  const handleUploadAudio = async () => {
-    if (!audioBlob || !currentTopic || !sessionId) {
-      addToast('Please complete your speaking recording.', 'error');
-      return false;
+  const handleStopAndSubmit = async () => {
+    const blob = await stopRecording();
+    if (blob && currentTopic) {
+      await uploadRecording(blob, currentTopic.id);
     }
+  };
 
+  const uploadRecording = async (blob, itemId) => {
     setIsUploading(true);
     try {
       const formData = new FormData();
-      formData.append('item_id', currentTopic.id);
-      formData.append('file', audioBlob, `${currentTopic.id}.webm`);
+      formData.append('item_id', itemId);
+      formData.append('file', blob, `${itemId}.webm`);
 
       await assessmentApi.uploadAudio(sessionId, formData);
-      setUploadedMap((prev) => ({ ...prev, [currentTopic.id]: true }));
-      addToast(`Topic ${currentIndex + 1} response recorded!`, 'success', 2000);
-      return true;
+      setRecordingDone(true);
     } catch (err) {
-      console.error('Failed to upload speech recording:', err);
-      addToast('Could not save audio recording. Please retry.', 'error');
-      return false;
+      console.error('Error uploading speaking recording:', err);
+      setWarnings((prev) => [...prev, '⚠️ Speech upload failed. Please try again.']);
     } finally {
       setIsUploading(false);
     }
   };
 
-  // Advance to next topic or Section C
-  const handleNext = async () => {
-    if (isRecording) {
-      stopRecording();
-    }
-
-    if (audioBlob && !uploadedMap[currentTopic.id]) {
-      const success = await handleUploadAudio();
-      if (!success) return;
-    }
-
-    if (currentIndex < items.length - 1) {
-      setCurrentIndex((prev) => prev + 1);
+  const handleNext = () => {
+    if (currentIdx < topics.length - 1) {
+      setCurrentIdx((prev) => prev + 1);
     } else {
-      addToast('Section B completed! Moving to Section C (Grammar).', 'success');
       navigate('/assessment/section-c', { state: { sessionId } });
     }
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
-        <div className="w-12 h-12 border-3 border-amber-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm font-medium text-slate-400">Loading Section B (Speaking Tasks)...</p>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="text-center space-y-3">
+          <div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-slate-600 font-medium text-sm">Loading Section B topics...</p>
+        </div>
       </div>
     );
   }
 
-  const isCurrentUploaded = uploadedMap[currentTopic?.id];
-  const progressPercent = items.length > 0 ? ((currentIndex + 1) / items.length) * 100 : 0;
-
-  return (
-    <div className="max-w-4xl mx-auto px-4 py-8 space-y-6 animate-fadeIn">
-      {/* Proctoring Warning Banner */}
-      {showWarning && (
-        <div className="p-4 rounded-2xl bg-rose-950/80 border border-rose-500/50 text-rose-200 text-xs flex items-center justify-between shadow-lg">
-          <div className="flex items-center gap-3">
-            <ShieldAlert className="w-5 h-5 text-rose-400 flex-shrink-0" />
-            <div>
-              <span className="font-bold">Proctoring Alert:</span> Tab switch logged ({tabSwitchCount} times).
-            </div>
-          </div>
+  if (!currentTopic) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="text-center space-y-4 max-w-md p-6 bg-white rounded-2xl border border-slate-200">
+          <AlertTriangle className="w-8 h-8 text-amber-500 mx-auto" />
+          <p className="text-slate-700 font-semibold">No topics found for Section B.</p>
           <button
-            onClick={() => setShowWarning(false)}
-            className="px-2 py-1 bg-rose-900/60 hover:bg-rose-900 rounded-lg text-[10px] font-bold uppercase"
+            onClick={() => navigate('/assessment')}
+            className="px-4 py-2 bg-amber-600 text-white rounded-xl text-sm font-semibold"
           >
-            Dismiss
+            Return to Assessment Intro
           </button>
         </div>
-      )}
-
-      {/* Section Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold uppercase tracking-wider">
-              Section B
-            </span>
-            <span className="text-xs text-slate-400 font-medium">Spontaneous Speaking</span>
-          </div>
-          <h1 className="text-xl font-extrabold text-white mt-1">Speaking & Articulation Tasks</h1>
-        </div>
-
-        <div className="flex items-center gap-3 text-xs text-slate-400 font-semibold">
-          <span>
-            Topic <strong className="text-amber-300">{currentIndex + 1}</strong> of {items.length}
-          </span>
-          <div className="w-28 h-2 bg-slate-800 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-300"
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
-        </div>
       </div>
+    );
+  }
 
-      {/* Main Topic Card */}
-      {currentTopic && (
-        <div className="p-6 sm:p-8 rounded-3xl bg-calm-900/90 border border-slate-800 shadow-2xl space-y-6">
-          {/* Phase Banner & Dual Timer */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-slate-950/80 border border-slate-800">
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-3.5 h-3.5 rounded-full ${
-                  phase === 'prep' ? 'bg-amber-400 animate-ping' : 'bg-rose-500 animate-pulse'
-                }`}
-              />
-              <div>
-                <span className="text-xs font-extrabold uppercase tracking-wider text-white">
-                  {phase === 'prep' ? 'Phase 1: Silent Preparation' : 'Phase 2: Speaking & Recording'}
-                </span>
-                <p className="text-[11px] text-slate-400">
-                  {phase === 'prep'
-                    ? 'Review the prompt and hint cards. Organize your thoughts silently.'
-                    : 'Speak clearly into your microphone addressing the topic.'}
-                </p>
-              </div>
+  const progressPercent = Math.round(((currentIdx + 1) / topics.length) * 100);
+
+  return (
+    <div className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8 text-slate-800">
+      <div className="max-w-4xl mx-auto space-y-6">
+
+        {/* Header Card */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 bg-amber-600 text-white text-xs font-bold rounded-lg">
+                🅱️ Section B
+              </span>
+              <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
+                phase === 'prep'
+                  ? 'bg-blue-50 text-blue-700 border-blue-200'
+                  : 'bg-red-50 text-red-700 border-red-200 animate-pulse'
+              }`}>
+                {phase === 'prep' ? '⏳ Preparation Phase' : '🎙️ Speaking Phase'}
+              </span>
             </div>
-
-            <div className="flex items-center gap-3">
-              {phase === 'prep' ? (
-                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-950/40 border border-amber-500/40 text-amber-300 text-sm font-bold">
-                  <Clock className="w-4 h-4" />
-                  <span>Prep: {prepTimeLeft}s</span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-950/50 border border-rose-500/50 text-rose-300 text-sm font-bold animate-pulse">
-                  <Mic className="w-4 h-4 text-rose-400" />
-                  <span>Speaking: {speakTimeLeft}s</span>
-                </div>
-              )}
-
-              {phase === 'prep' && (
-                <button
-                  onClick={handleTransitionToSpeaking}
-                  className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold"
-                >
-                  Skip Prep & Speak Now
-                </button>
-              )}
-            </div>
+            <h1 className="text-2xl font-black text-slate-900 mt-2">
+              Spoken Monologue Tasks
+            </h1>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Topic {currentIdx + 1} of {topics.length} ({topics.length - (currentIdx + 1)} remaining)
+            </p>
           </div>
 
-          {/* Topic Title Prompt */}
-          <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Speaking Prompt</span>
+          {/* Phase Countdown Timer */}
+          <div className="flex items-center gap-3">
+            <div className={`px-4 py-2 rounded-xl border font-mono font-bold text-sm flex items-center gap-2 ${
+              phase === 'speak'
+                ? 'bg-amber-50 text-amber-800 border-amber-300'
+                : 'bg-slate-50 text-slate-700 border-slate-200'
+            }`}>
+              <Clock className="w-4 h-4 text-slate-500" />
+              <span>{phase === 'prep' ? `Prep: ${timeLeft}s` : `Speak: ${timeLeft}s`}</span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-white leading-relaxed">
+
+            {tabSwitches > 0 && (
+              <div className="px-3 py-2 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-xs font-bold flex items-center gap-1.5">
+                <ShieldAlert className="w-4 h-4 text-amber-600" />
+                <span>{tabSwitches} Warning{tabSwitches > 1 ? 's' : ''}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+          <div
+            className="bg-amber-600 h-2 rounded-full transition-all duration-300"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+
+        {/* Proctoring Alerts */}
+        {warnings.length > 0 && (
+          <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs space-y-1">
+            {warnings.slice(-2).map((w, idx) => (
+              <div key={idx} className="flex items-center gap-2 font-medium">
+                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>{w}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Main Topic Card */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 space-y-6">
+
+          {/* Phase Banner */}
+          <div className={`p-4 rounded-xl border text-xs font-bold flex items-center justify-between ${
+            phase === 'prep'
+              ? 'bg-blue-50 border-blue-200 text-blue-900'
+              : 'bg-amber-50 border-amber-200 text-amber-900'
+          }`}>
+            <span>
+              {phase === 'prep'
+                ? '🧠 Preparation Phase (90s): Think through your response and structure your key points.'
+                : '🎙️ Speaking Phase (60s): Deliver your speech clearly. Audio is being recorded.'}
+            </span>
+
+            {phase === 'prep' && (
+              <button
+                type="button"
+                onClick={handleStartSpeakingNow}
+                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition shrink-0 ml-3"
+              >
+                Start Speaking Now →
+              </button>
+            )}
+          </div>
+
+          {/* Topic Title */}
+          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl text-center space-y-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              Topic Prompt
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
               {currentTopic.prompt_text}
             </h2>
           </div>
 
-          {/* Hint Cards */}
+          {/* Collapsible Hints Panel */}
           {currentTopic.hints && currentTopic.hints.length > 0 && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                <Lightbulb className="w-4 h-4 text-amber-400" />
-                <span>Guiding Questions to Structure Your Response</span>
-              </div>
+            <div className="border border-slate-200 rounded-xl overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setShowHints(!showHints)}
+                className="w-full px-4 py-3 bg-slate-50 hover:bg-slate-100 flex items-center justify-between text-xs font-bold text-slate-700 transition"
+              >
+                <div className="flex items-center gap-2">
+                  <HelpCircle className="w-4 h-4 text-amber-600" />
+                  <span>Guiding Prompts & Structure Hints</span>
+                </div>
+                {showHints ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {currentTopic.hints.map((hint, idx) => (
-                  <div
-                    key={idx}
-                    className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 text-xs text-slate-300 leading-relaxed flex items-start gap-2.5"
-                  >
-                    <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center text-[10px] flex-shrink-0 mt-0.5">
-                      {idx + 1}
-                    </span>
-                    <span>{hint}</span>
-                  </div>
-                ))}
-              </div>
+              {showHints && (
+                <div className="p-4 bg-white grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-600">
+                  {currentTopic.hints.map((hint, idx) => (
+                    <div key={idx} className="flex items-start gap-2 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                      <span className="w-5 h-5 bg-amber-100 text-amber-800 rounded-full flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">
+                        {idx + 1}
+                      </span>
+                      <span className="leading-relaxed font-medium">{hint}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
-          {/* Speaking Action Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-2xl bg-slate-900/80 border border-slate-800">
+          {/* Speaking Phase Recording Controls */}
+          <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              {phase === 'speaking' && !isRecording && (
-                <button
-                  onClick={startRecording}
-                  className="px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs transition-all flex items-center gap-2 shadow-md shadow-amber-900/30"
-                >
-                  <Mic className="w-4 h-4" />
-                  <span>Resume Recording</span>
-                </button>
+              {phase === 'prep' ? (
+                <span className="text-xs font-semibold text-slate-500 italic">
+                  Microphone will activate when the 90s prep phase concludes.
+                </span>
+              ) : (
+                <>
+                  {!isRecording ? (
+                    <button
+                      type="button"
+                      onClick={handleStartRecord}
+                      disabled={recordingDone || isUploading}
+                      className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-xl transition flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+                    >
+                      <Mic className="w-4 h-4" />
+                      <span>{recordingDone ? 'Speech Saved ✓' : 'Start Recording Speech'}</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleStopAndSubmit}
+                      className="px-6 py-3 bg-slate-900 hover:bg-black text-white font-bold text-sm rounded-xl transition flex items-center gap-2 animate-pulse shadow-sm"
+                    >
+                      <div className="w-3 h-3 bg-red-500 rounded-full animate-ping mr-1" />
+                      <span>Stop & Submit Speech</span>
+                    </button>
+                  )}
+                </>
               )}
 
-              {isRecording && (
-                <button
-                  onClick={stopRecording}
-                  className="px-5 py-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition-all flex items-center gap-2 shadow-md shadow-rose-900/30 animate-pulse"
-                >
-                  <Square className="w-4 h-4 fill-white" />
-                  <span>Stop Recording ({recordingTime}s)</span>
-                </button>
+              {isUploading && (
+                <span className="text-xs font-semibold text-amber-600 flex items-center gap-1.5">
+                  <UploadCloud className="w-4 h-4 animate-bounce" />
+                  Uploading speech...
+                </span>
               )}
 
-              {audioBlob && !isRecording && (
-                <span className="flex items-center gap-1.5 text-xs text-focus-400 font-semibold">
+              {recordingDone && !isUploading && (
+                <span className="text-xs font-bold text-emerald-600 flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>Speaking Response Captured ({recordingTime}s)</span>
+                  Speech recorded & saved
                 </span>
               )}
             </div>
 
-            <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-              <button
-                onClick={handleNext}
-                disabled={isUploading || phase === 'prep' || (!audioBlob && !isCurrentUploaded)}
-                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 disabled:opacity-40 text-white font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-900/40"
-              >
-                <span>
-                  {isUploading
-                    ? 'Saving...'
-                    : currentIndex === items.length - 1
-                    ? 'Proceed to Section C'
-                    : 'Save & Next Topic'}
-                </span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
+            {/* Next Topic Button */}
+            <button
+              type="button"
+              onClick={handleNext}
+              disabled={!recordingDone && !isUploading}
+              className="w-full sm:w-auto px-7 py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+            >
+              <span>{currentIdx < topics.length - 1 ? 'Next Topic' : 'Proceed to Section C (Grammar)'}</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
+
         </div>
-      )}
+
+      </div>
     </div>
   );
-};
-
-export default SectionB;
+}

@@ -1,358 +1,326 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { assessmentApi, authApi } from '../../services/api';
-import { useAuth } from '../../context/AuthContext';
-import { useToast } from '../../context/ToastContext';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { assessmentApi } from '../../services/api';
 import {
-  Sparkles,
+  Trophy,
   CheckCircle2,
   Clock,
-  Mic,
-  BookOpen,
-  HelpCircle,
-  Headphones,
   ShieldCheck,
   ShieldAlert,
-  ArrowRight,
-  RotateCw,
-  Sliders,
-  Play,
   Volume2,
-  Flame,
-  LayoutDashboard,
+  BookOpen,
+  Mic,
+  HelpCircle,
+  Headphones,
+  Sparkles,
+  ArrowRight,
+  RotateCcw,
+  User,
+  Activity,
+  AlertCircle
 } from 'lucide-react';
 
-export const AssessmentResults = () => {
+export default function AssessmentResults() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, updateProfile } = useAuth();
-  const { addToast } = useToast();
 
-  const [sessionId, setSessionId] = useState(
-    location.state?.sessionId || sessionStorage.getItem('bg_assessment_session_id') || ''
-  );
-  const [results, setResults] = useState(location.state?.results || null);
-  const [isLoading, setIsLoading] = useState(!location.state?.results);
-  const [isApplying, setIsApplying] = useState(false);
-  const [applied, setApplied] = useState(false);
+  const sessionId =
+    location.state?.sessionId || sessionStorage.getItem('bg_assessment_session_id');
 
-  // Fetch results from backend if not passed in location state
+  const [results, setResults] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeAudioItem, setActiveAudioItem] = useState(null);
+
   useEffect(() => {
-    const fetchResults = async () => {
-      if (results) return;
-      if (!sessionId) {
-        navigate('/assessment');
-        return;
-      }
+    if (!sessionId) {
+      navigate('/assessment');
+      return;
+    }
 
+    const fetchResults = async () => {
+      setIsLoading(true);
       try {
         const res = await assessmentApi.getResults(sessionId);
         setResults(res.data);
       } catch (err) {
-        console.error('Failed to fetch assessment results:', err);
-        addToast('Could not load assessment results.', 'error');
+        console.error('Error fetching assessment results:', err);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchResults();
-  }, [sessionId, results, navigate, addToast]);
-
-  const handleApplyProfile = async () => {
-    if (!results) return;
-    setIsApplying(true);
-    try {
-      await authApi.updateProfile({
-        focus_span_minutes: results.recommended_focus_span_minutes || 25,
-        preferred_content_style: results.recommended_content_style || 'bullet_points',
-        difficulty_level: results.recommended_difficulty_level || 'adaptive',
-      });
-      setApplied(true);
-      addToast('ADHD Study Profile calibrated and applied! 🎯', 'success');
-    } catch (err) {
-      console.error('Failed to update profile:', err);
-      addToast('Could not update profile settings.', 'error');
-    } finally {
-      setIsApplying(false);
-    }
-  };
+  }, [sessionId, navigate]);
 
   if (isLoading) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
-        <div className="w-12 h-12 border-3 border-brain-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm font-medium text-slate-400">Synthesizing Assessment Analytics...</p>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="text-center space-y-3">
+          <div className="w-10 h-10 border-4 border-brain-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-slate-600 font-medium text-sm">Compiling assessment scorecard...</p>
+        </div>
       </div>
     );
   }
 
   if (!results) {
     return (
-      <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
-        <h2 className="text-xl font-bold text-white">No Assessment Data Found</h2>
-        <p className="text-sm text-slate-400">Please start an assessment session to generate results.</p>
-        <Link
-          to="/assessment"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-brain-600 hover:bg-brain-500 text-white font-bold text-sm"
-        >
-          <span>Start Assessment</span>
-          <ArrowRight className="w-4 h-4" />
-        </Link>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="text-center space-y-4 max-w-md p-6 bg-white rounded-2xl border border-slate-200">
+          <AlertCircle className="w-10 h-10 text-red-500 mx-auto" />
+          <h2 className="text-lg font-bold text-slate-800">Results Unavailable</h2>
+          <p className="text-slate-600 text-xs">Could not locate scorecard for this assessment session.</p>
+          <button
+            onClick={() => navigate('/assessment')}
+            className="px-5 py-2.5 bg-brain-600 text-white rounded-xl text-xs font-bold"
+          >
+            Start New Assessment
+          </button>
+        </div>
       </div>
     );
   }
 
   const breakdown = results.per_section_breakdown || {};
+  const secA = breakdown.section_a || {};
+  const secB = breakdown.section_b || {};
+  const secC = breakdown.section_c || {};
+  const secD = breakdown.section_d || {};
+
   const audioUrls = results.audio_review_urls || {};
+  const audioItemIds = Object.keys(audioUrls);
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-8 animate-fadeIn">
-      {/* Top Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-brain-950/80 to-slate-900 border border-brain-500/40 p-8 shadow-2xl space-y-6">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-brain-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-slate-50 py-10 px-4 sm:px-6 lg:px-8 text-slate-800">
+      <div className="max-w-4xl mx-auto space-y-8">
 
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-focus-500/20 border border-focus-500/40 text-focus-300 text-xs font-bold uppercase tracking-wider">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              Assessment Completed
+        {/* Hero Scorecard Card */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 relative overflow-hidden">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-800 rounded-full text-xs font-bold border border-emerald-200">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Assessment Completed Successfully</span>
+              </div>
+
+              <h1 className="text-3xl font-black text-slate-900">
+                English Proficiency Scorecard
+              </h1>
+
+              <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 pt-1">
+                <div className="flex items-center gap-1.5 font-semibold text-slate-700">
+                  <User className="w-4 h-4 text-slate-400" />
+                  <span>Candidate: {results.candidate_name || 'Candidate'}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-slate-400" />
+                  <span>Completed on {new Date().toLocaleDateString()}</span>
+                </div>
+              </div>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Performance & Cognitive Profile Report
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-300">
-              Session ID: <span className="font-mono text-brain-300">{results.session_id}</span>
+
+            {/* Auto-Graded Overall Score Pill */}
+            <div className="flex flex-col items-center justify-center p-6 bg-brain-50 border-2 border-brain-100 rounded-2xl min-w-[170px] text-center">
+              <span className="text-xs font-bold uppercase tracking-wider text-brain-600">
+                Auto-Graded Score
+              </span>
+              <span className="text-4xl font-black text-slate-900 mt-1">
+                {results.auto_graded_score}%
+              </span>
+              <span className="text-[11px] text-slate-500 font-medium mt-1">
+                (Sections C & D)
+              </span>
+            </div>
+          </div>
+
+          {/* AI Learning & Pacing Summary */}
+          <div className="mt-8 pt-6 border-t border-slate-100 space-y-3 bg-slate-50/70 p-5 rounded-xl border border-slate-200/80">
+            <div className="flex items-center gap-2 text-xs font-bold text-brain-700">
+              <Sparkles className="w-4 h-4 text-brain-600" />
+              <span>AI Learning & Pacing Summary</span>
+            </div>
+            <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
+              {results.ai_summary}
             </p>
           </div>
+        </div>
 
-          {/* Auto-graded score pill */}
-          <div className="flex flex-col items-center justify-center p-6 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl min-w-[180px]">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-              Auto-Graded Score
+        {/* 4 Section Breakdown Grid */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-bold text-slate-900">
+            Section-by-Section Performance Breakdown
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            {/* Section A */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-blue-600 text-white">
+                  🅰️ Section A
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                  Pending Review
+                </span>
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 text-base">Reading & Listening</h3>
+                <p className="text-xs text-slate-500">18 Read Aloud + 5 Listen & Repeat items</p>
+              </div>
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-600">
+                <span>Audio Files Submitted:</span>
+                <span className="text-blue-700 font-bold">{secA.audio_recorded || 0} / 23</span>
+              </div>
+            </div>
+
+            {/* Section B */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-amber-600 text-white">
+                  🅱️ Section B
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                  Pending Review
+                </span>
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 text-base">Speaking Monologue</h3>
+                <p className="text-xs text-slate-500">4 Open-ended speaking topic responses</p>
+              </div>
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-600">
+                <span>Speech Audio Recorded:</span>
+                <span className="text-amber-700 font-bold">{secB.audio_recorded || 0} / 4</span>
+              </div>
+            </div>
+
+            {/* Section C */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-600 text-white">
+                  🅾️ Section C
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  Auto-Graded
+                </span>
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 text-base">Grammar Accuracy</h3>
+                <p className="text-xs text-slate-500">34 Multiple-choice grammar items</p>
+              </div>
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-600">
+                <span>Score:</span>
+                <span className="text-emerald-700 font-bold text-sm">
+                  {secC.accuracy_percentage}% ({secC.correct_count} / {secC.total_count})
+                </span>
+              </div>
+            </div>
+
+            {/* Section D */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-purple-600 text-white">
+                  🅳 Section D
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                  Auto-Graded
+                </span>
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 text-base">Listening Comprehension</h3>
+                <p className="text-xs text-slate-500">4 Audio Passages + 16 Questions</p>
+              </div>
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-600">
+                <span>Score:</span>
+                <span className="text-purple-700 font-bold text-sm">
+                  {secD.accuracy_percentage}% ({secD.correct_count} / {secD.total_count})
+                </span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Proctoring Log */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
+              {results.tab_switch_count > 0 ? (
+                <ShieldAlert className="w-4 h-4 text-amber-600" />
+              ) : (
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              )}
+              <span>Proctoring Integrity Report</span>
+            </div>
+            <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${
+              results.tab_switch_count > 0
+                ? 'bg-amber-50 text-amber-800 border-amber-200'
+                : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+            }`}>
+              {results.tab_switch_count} Tab Switch Events Logged
             </span>
-            <div className="text-4xl font-black bg-gradient-to-r from-brain-300 via-focus-400 to-indigo-400 bg-clip-text text-transparent mt-1">
-              {results.auto_graded_score}%
-            </div>
-            <span className="text-[10px] text-slate-500 mt-1">Sections C & D Evaluated</span>
           </div>
+
+          <p className="text-xs text-slate-500">
+            {results.tab_switch_count === 0
+              ? 'Excellent proctoring compliance. No browser tab switches or window defocus events were detected.'
+              : `The candidate switched browser tabs ${results.tab_switch_count} time(s) during the assessment. Timestamps have been recorded for instructor review.`}
+          </p>
         </div>
 
-        {/* AI Plain-Language Non-Diagnostic Summary */}
-        <div className="relative z-10 p-6 rounded-2xl bg-calm-950/70 border border-brain-500/30 space-y-2">
-          <div className="flex items-center gap-2 text-xs font-bold text-brain-400 uppercase tracking-wider">
-            <Sparkles className="w-4 h-4" />
-            <span>AI Study-Pacing & Momentum Synthesis</span>
-          </div>
-          <p className="text-sm text-slate-200 leading-relaxed">{results.ai_summary}</p>
-        </div>
-      </div>
-
-      {/* 4 Sections Breakdown Grid */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-          <Flame className="w-5 h-5 text-brain-400" />
-          <span>Section Performance Breakdown</span>
-        </h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Section A */}
-          <div className="p-5 rounded-2xl bg-calm-900/80 border border-slate-800 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold px-2 py-0.5 rounded bg-brain-500/20 text-brain-300 border border-brain-500/40">
-                Section A
-              </span>
-              <span className="text-[10px] font-semibold text-amber-400 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-500/30">
-                Pending Review
-              </span>
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-white">Reading & Listening</h3>
-              <p className="text-xs text-slate-400 mt-1">
-                {breakdown.section_a?.audio_recorded || 0} / {breakdown.section_a?.items_count || 23} Audio Clips Saved
-              </p>
-            </div>
-          </div>
-
-          {/* Section B */}
-          <div className="p-5 rounded-2xl bg-calm-900/80 border border-slate-800 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                Section B
-              </span>
-              <span className="text-[10px] font-semibold text-amber-400 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-500/30">
-                Pending Review
-              </span>
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-white">Speaking Tasks</h3>
-              <p className="text-xs text-slate-400 mt-1">
-                {breakdown.section_b?.audio_recorded || 0} / {breakdown.section_b?.items_count || 4} Topics Recorded
-              </p>
-            </div>
-          </div>
-
-          {/* Section C */}
-          <div className="p-5 rounded-2xl bg-calm-900/80 border border-slate-800 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                Section C
-              </span>
-              <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/30">
-                Auto-Graded
-              </span>
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-white">Grammar Accuracy</h3>
-              <p className="text-xs text-slate-400 mt-1">
-                {breakdown.section_c?.correct_count ?? '--'} / {breakdown.section_c?.total_count ?? 34} Correct (
-                {breakdown.section_c?.accuracy_percentage ?? 0}%)
-              </p>
-            </div>
-          </div>
-
-          {/* Section D */}
-          <div className="p-5 rounded-2xl bg-calm-900/80 border border-slate-800 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
-                Section D
-              </span>
-              <span className="text-[10px] font-semibold text-cyan-400 bg-cyan-950/40 px-2 py-0.5 rounded border border-cyan-500/30">
-                Auto-Graded
-              </span>
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-white">Listening Comprehension</h3>
-              <p className="text-xs text-slate-400 mt-1">
-                {breakdown.section_d?.correct_count ?? '--'} / {breakdown.section_d?.total_count ?? 16} Correct (
-                {breakdown.section_d?.accuracy_percentage ?? 0}%)
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Proctoring Log & Audio Review Player */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Audio Recordings Review Player */}
-        <div className="p-6 rounded-3xl bg-calm-900/90 border border-slate-800 shadow-xl space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <Mic className="w-4 h-4 text-brain-400" />
-              <span>Your Audio Recordings Review</span>
-            </h3>
-            <span className="text-xs text-slate-400 font-semibold">
-              {Object.keys(audioUrls).length} Files
-            </span>
-          </div>
+        {audioItemIds.length > 0 && (
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+            <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
+              <Volume2 className="w-4 h-4 text-brain-600" />
+              <span>Review Your Audio Submissions ({audioItemIds.length} Recordings)</span>
+            </div>
 
-          {Object.keys(audioUrls).length === 0 ? (
-            <p className="text-xs text-slate-400 italic">No audio recordings found for this session.</p>
-          ) : (
-            <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
-              {Object.entries(audioUrls).map(([itemId, storagePath]) => {
-                const audioSrc = `http://localhost:8000/api/assessment/audio/${storagePath}`;
-                return (
-                  <div
-                    key={itemId}
-                    className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 space-y-2"
-                  >
-                    <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
-                      <span className="font-mono text-brain-300">{itemId}</span>
-                      <span className="text-[10px] text-slate-500 uppercase">Audio Capture</span>
-                    </div>
-                    <audio
-                      controls
-                      src={audioSrc}
-                      className="w-full h-8 rounded-lg outline-none"
-                    />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-72 overflow-y-auto pr-1">
+              {audioItemIds.map((itemId) => (
+                <div
+                  key={itemId}
+                  className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2"
+                >
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+                    <span>Item: {itemId}</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded bg-slate-200 text-slate-700 font-semibold">
+                      WebM Audio
+                    </span>
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Calibrated ADHD Learning Settings & Proctoring */}
-        <div className="p-6 rounded-3xl bg-calm-900/90 border border-slate-800 shadow-xl space-y-5">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <Sliders className="w-4 h-4 text-focus-400" />
-              <span>Calibrated Study Profile</span>
-            </h3>
-            <div className="flex items-center gap-1.5 text-xs text-slate-400">
-              <ShieldCheck className="w-4 h-4 text-focus-400" />
-              <span>Tab Switches: {results.tab_switch_count ?? 0}</span>
+                  <audio
+                    controls
+                    src={audioUrls[itemId]}
+                    className="w-full h-8"
+                    preload="none"
+                  />
+                </div>
+              ))}
             </div>
           </div>
+        )}
 
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 text-xs">
-              <span className="text-slate-400">Recommended Focus Sprint:</span>
-              <strong className="text-brain-300 font-bold">
-                {results.recommended_focus_span_minutes || 25} Minutes
-              </strong>
-            </div>
-
-            <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 text-xs">
-              <span className="text-slate-400">Content Processing Style:</span>
-              <strong className="text-focus-300 font-bold uppercase">
-                {results.recommended_content_style?.replace('_', ' ') || 'Bullet Points'}
-              </strong>
-            </div>
-
-            <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 text-xs">
-              <span className="text-slate-400">Difficulty Pacing:</span>
-              <strong className="text-amber-300 font-bold uppercase">
-                {results.recommended_difficulty_level || 'Adaptive'}
-              </strong>
-            </div>
-          </div>
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+          <button
+            type="button"
+            onClick={() => navigate('/assessment')}
+            className="w-full sm:w-auto px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl transition flex items-center justify-center gap-2"
+          >
+            <RotateCcw className="w-4 h-4" />
+            <span>Retake Assessment</span>
+          </button>
 
           <button
-            onClick={handleApplyProfile}
-            disabled={isApplying || applied}
-            className={`w-full py-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-lg ${
-              applied
-                ? 'bg-focus-600/20 border border-focus-500/40 text-focus-300'
-                : 'bg-gradient-to-r from-focus-600 to-emerald-600 hover:from-focus-500 hover:to-emerald-500 text-white shadow-focus-900/30'
-            }`}
+            type="button"
+            onClick={() => navigate('/dashboard')}
+            className="w-full sm:w-auto px-8 py-3 bg-brain-600 hover:bg-brain-700 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-2 shadow-sm"
           >
-            {applied ? (
-              <>
-                <CheckCircle2 className="w-4 h-4 text-focus-400" />
-                <span>Profile Settings Applied</span>
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-4 h-4" />
-                <span>{isApplying ? 'Applying Settings...' : 'Apply Calibrated Settings'}</span>
-              </>
-            )}
+            <span>Return to Dashboard</span>
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
-      </div>
 
-      {/* Navigation Footer */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-800">
-        <Link
-          to="/"
-          className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-bold flex items-center justify-center gap-2 transition-all"
-        >
-          <LayoutDashboard className="w-4 h-4" />
-          <span>Return to Dashboard</span>
-        </Link>
-
-        <Link
-          to="/focus"
-          className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-brain-600 to-indigo-600 hover:from-brain-500 hover:to-indigo-500 text-white font-bold text-xs shadow-xl shadow-brain-900/40 flex items-center justify-center gap-2 transition-all"
-        >
-          <span>Start a Calibrated Focus Sprint</span>
-          <ArrowRight className="w-4 h-4" />
-        </Link>
       </div>
     </div>
   );
-};
-
-export default AssessmentResults;
+}
