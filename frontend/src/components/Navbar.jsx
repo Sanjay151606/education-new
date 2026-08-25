@@ -14,6 +14,8 @@ export default function Navbar() {
         <Link to="/materials" className="hover:text-brain-600">Study Materials</Link>
         <Link to="/focus" className="hover:text-brain-600">Focus Mode</Link>
         <Link to="/progress" className="hover:text-brain-600">Progress</Link>
+        <Link to="/assessment" className="hover:text-brain-600 font-semibold text-brain-600">Assessment</Link>
+
         {user ? (
           <button
             onClick={() => { logout(); navigate("/login"); }}

@@ -9,6 +9,12 @@ import Tasks from "./pages/Tasks";
 import StudyMaterials from "./pages/StudyMaterials";
 import FocusMode from "./pages/FocusMode";
 import Progress from "./pages/Progress";
+import AssessmentIntro from "./pages/assessment/AssessmentIntro";
+import SectionA from "./pages/assessment/SectionA";
+import SectionB from "./pages/assessment/SectionB";
+import SectionC from "./pages/assessment/SectionC";
+import SectionD from "./pages/assessment/SectionD";
+import AssessmentResults from "./pages/assessment/AssessmentResults";
 import { useAuth } from "./context/AuthContext";
 
 function Private({ children }) {
@@ -41,7 +47,14 @@ export default function App() {
         <Route path="/materials" element={<Private><StudyMaterials /></Private>} />
         <Route path="/focus" element={<Private><FocusMode /></Private>} />
         <Route path="/progress" element={<Private><Progress /></Private>} />
+        <Route path="/assessment" element={<Private><AssessmentIntro /></Private>} />
+        <Route path="/assessment/section-a" element={<Private><SectionA /></Private>} />
+        <Route path="/assessment/section-b" element={<Private><SectionB /></Private>} />
+        <Route path="/assessment/section-c" element={<Private><SectionC /></Private>} />
+        <Route path="/assessment/section-d" element={<Private><SectionD /></Private>} />
+        <Route path="/assessment/results" element={<Private><AssessmentResults /></Private>} />
       </Routes>
     </>
   );
 }
+
