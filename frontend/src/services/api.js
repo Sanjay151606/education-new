@@ -90,19 +90,20 @@ export const progressApi = {
 
 // Assessment API (4-Section Assessment Module)
 export const assessmentApi = {
-  start: () => api.post('/api/assessment/start'),
+  start: (data) => api.post('/api/assessment/start', data || {}),
   getSection: (sessionId, section) => api.get(`/api/assessment/${sessionId}/section/${section}`),
   respond: (sessionId, data) => api.post(`/api/assessment/${sessionId}/respond`, data),
   uploadAudio: (sessionId, formData) =>
     api.post(`/api/assessment/${sessionId}/upload-audio`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     }),
-  recordTabSwitch: (sessionId, data = { warning_message: 'Tab switch detected' }) =>
+  recordTabSwitch: (sessionId, data = { reason: 'Tab switch detected' }) =>
     api.post(`/api/assessment/${sessionId}/tab-switch`, data),
   complete: (sessionId) => api.post(`/api/assessment/${sessionId}/complete`),
   getResults: (sessionId) => api.get(`/api/assessment/${sessionId}/results`),
   getHistory: () => api.get('/api/assessment/history'),
 };
+
 
 export default api;
 

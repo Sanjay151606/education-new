@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { assessmentApi } from '../../services/api';
-import { useToast } from '../../context/ToastContext';
+import { useAuth } from '../../context/AuthContext';
 import {
-  Sparkles,
   Mic,
-  MicOff,
-  BookOpen,
   Volume2,
+  BookOpen,
   HelpCircle,
   Headphones,
   ShieldCheck,
@@ -15,29 +13,40 @@ import {
   Clock,
   CheckCircle2,
   AlertTriangle,
-  Flame,
+  User,
+  Sparkles,
+  Info,
+  Layers
 } from 'lucide-react';
 
-export const AssessmentIntro = () => {
+export default function AssessmentIntro() {
   const navigate = useNavigate();
-  const { addToast } = useToast();
+  const { user } = useAuth();
 
+  const [candidateName, setCandidateName] = useState(user?.full_name || 'John Doe');
   const [hasMicPermission, setHasMicPermission] = useState(null);
   const [isCheckingMic, setIsCheckingMic] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  useEffect(() => {
+    if (user?.full_name) {
+      setCandidateName(user.full_name);
+    }
+  }, [user]);
 
   // Check microphone permissions
   const checkMicrophone = async () => {
     setIsCheckingMic(true);
+    setErrorMsg('');
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       setHasMicPermission(true);
       stream.getTracks().forEach((t) => t.stop());
-      addToast('Microphone access verified! 🎙️', 'success');
     } catch (err) {
       console.warn('Microphone permission error:', err);
       setHasMicPermission(false);
-      addToast('Microphone access required for speech tasks. Please allow access.', 'error');
+      setErrorMsg('Microphone access is required for Sections A and B. Please grant permission in your browser.');
     } finally {
       setIsCheckingMic(false);
     }
@@ -55,22 +64,26 @@ export const AssessmentIntro = () => {
   }, []);
 
   const handleStart = async () => {
-    if (hasMicPermission === false) {
-      addToast('Please enable microphone access before proceeding.', 'error');
+    if (!candidateName.trim()) {
+      setErrorMsg('Please enter candidate name before starting.');
       return;
     }
 
     setIsStarting(true);
+    setErrorMsg('');
     try {
-      const res = await assessmentApi.start();
+      const res = await assessmentApi.start({ candidate_name: candidateName.trim() });
       const session = res.data;
-      // Store active session ID for cross-section navigation
+      
+      // Store session data in sessionStorage
       sessionStorage.setItem('bg_assessment_session_id', session.session_id);
-      addToast('Assessment started! Good luck with Section A.', 'info');
+      sessionStorage.setItem('bg_assessment_candidate_name', session.candidate_name || candidateName.trim());
+      sessionStorage.setItem('bg_assessment_section_a_items', JSON.stringify(session.items || []));
+
       navigate('/assessment/section-a', { state: { sessionId: session.session_id } });
     } catch (err) {
       console.error('Failed to start assessment session:', err);
-      addToast('Could not initialize assessment. Please verify your connection.', 'error');
+      setErrorMsg('Could not initialize assessment session. Please verify your connection.');
     } finally {
       setIsStarting(false);
     }
@@ -78,203 +91,233 @@ export const AssessmentIntro = () => {
 
   const sectionsOverview = [
     {
-      badge: 'Section A',
+      badge: '🅰️ Section A',
       title: 'Reading & Listening',
-      accent: 'border-brain-500/40 bg-brain-950/40 text-brain-300',
+      color: 'border-blue-200 bg-blue-50/70 hover:bg-blue-50 text-blue-900',
+      badgeColor: 'bg-blue-600 text-white',
       icon: BookOpen,
+      count: '23 Questions',
       items: '18 Read-Aloud + 5 Listen-Repeat',
-      time: '~10 Mins',
-      desc: 'Read sentences aloud under timed prompts, then listen to one-time audio clips and repeat.',
+      time: '~15 Mins',
+      desc: 'Read sentences aloud under timed prompts, then listen to single-play audio sentences and repeat.',
     },
     {
-      badge: 'Section B',
+      badge: '🅱️ Section B',
       title: 'Speaking Tasks',
-      accent: 'border-amber-500/40 bg-amber-950/30 text-amber-300',
+      color: 'border-amber-200 bg-amber-50/70 hover:bg-amber-50 text-amber-900',
+      badgeColor: 'bg-amber-600 text-white',
       icon: Mic,
-      items: '4 Open Speaking Topics',
+      count: '4 Topics',
+      items: '4 Open-Ended Speaking Topics',
       time: '~10 Mins',
-      desc: '90 seconds of silent thought and planning with guided hints, followed by 60 seconds of speaking.',
+      desc: '90 seconds of silent preparation with hint prompts, followed by 60 seconds of recorded speaking.',
     },
     {
-      badge: 'Section C',
+      badge: '🅾️ Section C',
       title: 'Grammar Accuracy',
-      accent: 'border-emerald-500/40 bg-emerald-950/30 text-emerald-300',
+      color: 'border-emerald-200 bg-emerald-50/70 hover:bg-emerald-50 text-emerald-900',
+      badgeColor: 'bg-emerald-600 text-white',
       icon: HelpCircle,
-      items: '34 Multiple-Choice Items',
-      time: 'Untimed',
-      desc: 'Test your grasp across Verb Forms, Tenses, Articles, Voice Change, and Sentence Agreement.',
+      count: '34 Questions',
+      items: 'Verb Forms, Tenses, Articles & Voice',
+      time: '~20 Mins',
+      desc: 'Multiple-choice questions testing core syntactic patterns, tenses, prepositions, and sentence correction.',
     },
     {
-      badge: 'Section D',
+      badge: '🅳 Section D',
       title: 'Listening Comprehension',
-      accent: 'border-cyan-500/40 bg-cyan-950/30 text-cyan-300',
+      color: 'border-purple-200 bg-purple-50/70 hover:bg-purple-50 text-purple-900',
+      badgeColor: 'bg-purple-600 text-white',
       icon: Headphones,
-      items: '4 Passages + 16 Questions',
-      time: '~12 Mins',
-      desc: 'Listen to each audio passage once. Questions reveal after playback completes.',
+      count: '16 Questions',
+      items: '4 Passages (4 MCQs each)',
+      time: '~20 Mins',
+      desc: 'Listen to full audio passages played once without pause/rewind. Questions unlock only after listening.',
     },
   ];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 space-y-8 animate-fadeIn">
-      {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-brain-950/80 to-slate-900 border border-brain-500/30 p-8 shadow-2xl shadow-brain-950/50">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-brain-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brain-500/20 border border-brain-500/40 text-brain-300 text-xs font-semibold uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5" />
-              Comprehensive 4-Section Assessment
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              English Language & Cognitive Flow Assessment
-            </h1>
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-              Calibrate your speech fluency, listening comprehension, grammar precision, and working memory
-              rhythms in an integrated, ADHD-friendly testing flow.
-            </p>
-          </div>
-
-          <div className="flex flex-col items-center gap-3 w-full md:w-auto bg-slate-900/90 border border-slate-800 p-5 rounded-2xl shadow-inner">
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-300">
-              <Clock className="w-4 h-4 text-brain-400" />
-              <span>Est. Duration: ~35–40 mins</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs font-bold text-focus-400">
-              <ShieldCheck className="w-4 h-4" />
-              <span>Proctored Session</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Proctoring & Non-Clinical Framing Disclaimer */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="p-5 rounded-2xl bg-calm-900/60 border border-slate-800 text-xs text-slate-300 space-y-2">
-          <div className="flex items-center gap-2 text-brain-400 font-bold uppercase tracking-wider">
-            <ShieldCheck className="w-4 h-4" />
-            <span>Integrity & Proctoring Guidelines</span>
-          </div>
-          <p>
-            Please remain on this browser tab throughout the assessment. Tab-switching and window minimizations
-            are monitored and logged to ensure authentic results.
-          </p>
-        </div>
-
-        <div className="p-5 rounded-2xl bg-calm-900/60 border border-slate-800 text-xs text-slate-300 space-y-2">
-          <div className="flex items-center gap-2 text-amber-400 font-bold uppercase tracking-wider">
-            <AlertTriangle className="w-4 h-4" />
-            <span>Educational Calibration Disclaimer</span>
-          </div>
-          <p>
-            This assessment measures educational study pacing, reading stamina, and working memory recall.
-            It is <strong>not a medical or clinical diagnosis</strong> for ADHD or any other condition.
-          </p>
-        </div>
-      </div>
-
-      {/* 4 Sections Grid */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-          <Flame className="w-5 h-5 text-brain-400" />
-          <span>Assessment Structure</span>
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {sectionsOverview.map((sec, idx) => {
-            const Icon = sec.icon;
-            return (
-              <div
-                key={idx}
-                className="relative flex flex-col justify-between p-6 rounded-2xl bg-calm-900/80 border border-slate-800/80 hover:border-brain-500/40 transition-all duration-200 group shadow-lg shadow-black/20"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${sec.accent}`}
-                    >
-                      {sec.badge}
-                    </span>
-                    <span className="text-xs font-semibold text-slate-400 flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5" />
-                      {sec.time}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-800/80 border border-slate-700/50 flex items-center justify-center text-brain-400 group-hover:scale-105 transition-transform">
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h3 className="text-base font-bold text-white group-hover:text-brain-300 transition-colors">
-                        {sec.title}
-                      </h3>
-                      <p className="text-xs text-slate-400 font-medium">{sec.items}</p>
-                    </div>
-                  </div>
-
-                  <p className="text-xs text-slate-300 leading-relaxed pt-1">{sec.desc}</p>
-                </div>
+    <div className="min-h-screen bg-slate-50 py-10 px-4 sm:px-6 lg:px-8 text-slate-800">
+      <div className="max-w-5xl mx-auto space-y-8">
+        
+        {/* Header Hero */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 relative overflow-hidden">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brain-50 text-brain-600 border border-brain-100">
+                <Sparkles className="w-3.5 h-3.5" />
+                Adaptive English Proficiency Test
               </div>
-            );
-          })}
-        </div>
-      </div>
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                Comprehensive English Assessment
+              </h1>
+              <p className="text-slate-600 text-sm sm:text-base max-w-2xl">
+                A structured 4-section assessment evaluating spoken fluency, speech repetition, grammar accuracy, and listening comprehension.
+              </p>
+            </div>
 
-      {/* Pre-Flight Checklist & Start Action */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-slate-900 via-brain-950/60 to-slate-900 border border-brain-500/40 shadow-xl space-y-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
-          <div className="space-y-1">
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              <Mic className="w-5 h-5 text-brain-400" />
-              <span>Microphone Hardware Check</span>
-            </h3>
-            <p className="text-xs text-slate-400">
-              Sections A and B require audio recording permissions to capture your speech.
-            </p>
+            {/* Quick Metrics */}
+            <div className="flex sm:flex-col gap-3 justify-center bg-slate-50 border border-slate-200/80 rounded-xl p-4 min-w-[200px]">
+              <div className="flex items-center gap-2 text-slate-700 text-xs sm:text-sm">
+                <Clock className="w-4 h-4 text-brain-500" />
+                <span><strong>60–90 min</strong> total duration</span>
+              </div>
+              <div className="flex items-center gap-2 text-slate-700 text-xs sm:text-sm">
+                <Layers className="w-4 h-4 text-emerald-500" />
+                <span><strong>77 Questions</strong> across 4 sections</span>
+              </div>
+              <div className="flex items-center gap-2 text-slate-700 text-xs sm:text-sm">
+                <ShieldCheck className="w-4 h-4 text-amber-500" />
+                <span><strong>Proctored</strong> tab & mic tracking</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Candidate Name Input */}
+          <div className="mt-8 pt-6 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div className="md:col-span-2">
+              <label htmlFor="candidate_name" className="block text-sm font-semibold text-slate-700 mb-1">
+                Candidate Name <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  id="candidate_name"
+                  type="text"
+                  value={candidateName}
+                  onChange={(e) => setCandidateName(e.target.value)}
+                  placeholder="Enter full name for certificate & results"
+                  className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brain-500 font-medium"
+                />
+              </div>
+            </div>
+
+            <div>
+              <button
+                type="button"
+                onClick={checkMicrophone}
+                disabled={isCheckingMic}
+                className={`w-full py-2.5 px-4 rounded-xl text-sm font-medium border flex items-center justify-center gap-2 transition ${
+                  hasMicPermission
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                    : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-300'
+                }`}
+              >
+                <Mic className={`w-4 h-4 ${hasMicPermission ? 'text-emerald-600' : 'text-slate-500'}`} />
+                {isCheckingMic
+                  ? 'Testing Mic...'
+                  : hasMicPermission
+                  ? 'Mic Verified ✓'
+                  : 'Test Microphone'}
+              </button>
+            </div>
+          </div>
+
+          {errorMsg && (
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+          )}
+        </div>
+
+        {/* 4 Sections Grid */}
+        <div>
+          <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <span>Assessment Sections Overview</span>
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {sectionsOverview.map((sec, idx) => {
+              const Icon = sec.icon;
+              return (
+                <div
+                  key={idx}
+                  className={`rounded-2xl border p-5 transition-all flex flex-col justify-between ${sec.color}`}
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className={`px-2.5 py-0.5 rounded-md text-xs font-bold ${sec.badgeColor}`}>
+                        {sec.badge}
+                      </span>
+                      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-white/80 border border-slate-200 text-slate-600">
+                        {sec.time}
+                      </span>
+                    </div>
+
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900">{sec.title}</h3>
+                      <p className="text-xs font-semibold opacity-75 mt-0.5">{sec.items}</p>
+                    </div>
+
+                    <p className="text-xs leading-relaxed opacity-90">{sec.desc}</p>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-slate-200/50 flex items-center justify-between text-xs font-semibold">
+                    <span>{sec.count}</span>
+                    <span className="text-slate-500">Audio/Response Saved</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Instructions Card */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+          <div className="flex items-center gap-2 text-slate-900 font-bold text-base">
+            <Info className="w-5 h-5 text-brain-600" />
+            <h3>Important Instructions & Proctoring Guidelines</h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-600">
+            <div className="flex items-start gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              <span><strong>Microphone Requirement:</strong> Please ensure microphone access is granted. Speak clearly into your mic during speaking questions.</span>
+            </div>
+
+            <div className="flex items-start gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              <span><strong>Single-Play Audio:</strong> Audio clips in Sections A and D play strictly ONCE with no pause or replay available.</span>
+            </div>
+
+            <div className="flex items-start gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <span><strong>Tab Proctoring:</strong> Do not switch tabs or minimize your window during the test. Tab switch events are tracked and logged.</span>
+            </div>
+
+            <div className="flex items-start gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              <span><strong>Autosaving:</strong> Answers and audio recordings are saved directly to the server as you progress through each section.</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Callout */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-brain-600 rounded-2xl text-white shadow-md">
+          <div>
+            <h4 className="font-bold text-lg">Ready to begin your assessment?</h4>
+            <p className="text-brain-100 text-xs sm:text-sm">Make sure you are in a quiet room with headphones or speakers ready.</p>
           </div>
 
           <button
-            onClick={checkMicrophone}
-            disabled={isCheckingMic}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
-              hasMicPermission
-                ? 'bg-focus-500/20 border border-focus-500/40 text-focus-300'
-                : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
-            }`}
+            type="button"
+            onClick={handleStart}
+            disabled={isStarting}
+            className="w-full sm:w-auto px-8 py-3.5 bg-white text-brain-600 hover:bg-brain-50 font-bold rounded-xl text-sm transition shadow-sm flex items-center justify-center gap-2 shrink-0 disabled:opacity-50"
           >
-            {hasMicPermission ? (
-              <>
-                <CheckCircle2 className="w-4 h-4 text-focus-400" />
-                <span>Microphone Ready</span>
-              </>
+            {isStarting ? (
+              <span>Initializing Test...</span>
             ) : (
               <>
-                <Mic className="w-4 h-4 text-brain-400" />
-                <span>{isCheckingMic ? 'Checking...' : 'Test Microphone'}</span>
+                <span>Start New Test</span>
+                <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-          <div className="text-xs text-slate-400 flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-focus-400 flex-shrink-0" />
-            <span>Your progress will be automatically saved across all four sections.</span>
-          </div>
-
-          <button
-            onClick={handleStart}
-            disabled={isStarting}
-            className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-brain-600 to-indigo-600 hover:from-brain-500 hover:to-indigo-500 text-white font-bold text-sm shadow-xl shadow-brain-900/40 hover:shadow-brain-600/30 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-          >
-            <span>{isStarting ? 'Initializing Session...' : 'Begin Section A'}</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
       </div>
     </div>
   );
-};
-
-export default AssessmentIntro;
+}
