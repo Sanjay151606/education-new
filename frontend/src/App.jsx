@@ -12,9 +12,18 @@ import Progress from "./pages/Progress";
 import { useAuth } from "./context/AuthContext";
 
 function Private({ children }) {
-  const { user, loading } = useAuth();
+  const { user, session, loading } = useAuth();
+  // Show nothing while auth state is being determined
+  if (loading) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',fontSize:'1.2rem',color:'#888'}}>Loading...</div>;
+  // Allow access if session exists (user profile may still be loading from backend)
+  return (session || user) ? children : <Navigate to="/login" replace />;
+}
+
+function PublicOnly({ children }) {
+  const { session, loading } = useAuth();
   if (loading) return null;
-  return user ? children : <Navigate to="/login" />;
+  // Redirect already logged-in users away from login/register pages
+  return session ? <Navigate to="/dashboard" replace /> : children;
 }
 
 export default function App() {
@@ -23,8 +32,8 @@ export default function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<PublicOnly><Login /></PublicOnly>} />
+        <Route path="/register" element={<PublicOnly><Register /></PublicOnly>} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/dashboard" element={<Private><Dashboard /></Private>} />
