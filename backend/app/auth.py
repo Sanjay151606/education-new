@@ -29,23 +29,26 @@ def get_current_user(
     jwt_secret = settings.effective_jwt_secret
 
     try:
+        # Guard against missing or placeholder Supabase JWT secret
+        if not jwt_secret or jwt_secret == "REPLACE_WITH_YOUR_SUPABASE_JWT_SECRET":
+            # Only enforce in production environment
+            if getattr(settings, "environment", "development") != "development":
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Supabase JWT secret not configured. Set SUPABASE_JWT_SECRET in .env.",
+                )
         # If a secret is provided, verify signature.
         if jwt_secret:
-            # Guard against missing or placeholder Supabase JWT secret
-        if not jwt_secret or jwt_secret == "REPLACE_WITH_YOUR_SUPABASE_JWT_SECRET":
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Supabase JWT secret not configured. Set SUPABASE_JWT_SECRET in .env.",
+            payload = jwt.decode(
+                token,
+                jwt_secret,
+                algorithms=[settings.jwt_algorithm],
+                options={"verify_aud": False},
             )
-        payload = jwt.decode(
-            token,
-            jwt_secret,
-            algorithms=[settings.jwt_algorithm],
-            options={"verify_aud": False},
-        )
         else:
             # Fallback for unconfigured dev environment (claims parsing without signature check)
             payload = jwt.get_unverified_claims(token)
+
 
         user_id_str: Optional[str] = payload.get("sub")
         if not user_id_str:

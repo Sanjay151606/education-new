@@ -1,8 +1,11 @@
 import os
+import sys
 import pytest
 from jose import jwt
 from fastapi.testclient import TestClient
-from app.main import app  # Assuming your FastAPI instance is exported as `app`
+# Ensure the app package can be imported
+sys.path.append(os.path.abspath(os.path.join(__file__, '..', '..')))
+from app.main import app  # Import FastAPI instance
 
 # Load the Supabase JWT secret from environment (fallback to a test secret)
 TEST_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET", "test-secret")
